@@ -163,3 +163,4 @@ cython_debug/
 
 *.xlsx
 *.json
+*.csv
