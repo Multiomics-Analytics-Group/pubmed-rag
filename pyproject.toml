@@ -6,8 +6,7 @@ authors = ["Angel L. P. <59593766+angelphanth@users.noreply.github.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
-numpy = "^2.1.0"
+python = ">=3.11,<3.12"
 pandas = "^2.2.2"
 matplotlib = "^3.9.2"
 scikit-learn = "^1.5.1"
@@ -18,6 +17,14 @@ openpyxl = "^3.1.5"
 requests = "^2.32.3"
 biopython = "^1.84"
 pyyaml = "^6.0.2"
+transformers = "^4.44.2"
+torch = "^2.4.1"
+torchvision = "^0.19.1"
+torchaudio = "^2.4.1"
+tensorflow = "^2.17.0"
+flax = "^0.9.0"
+tf-keras = "^2.17.0"
+ipywidgets = "^8.1.5"
 
 
 [build-system]
