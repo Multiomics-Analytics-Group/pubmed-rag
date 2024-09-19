@@ -126,3 +126,68 @@ def passages_to_df(result:dict, out_path:str, prefix:str='df_')->pd.DataFrame:
 
     return df
     
+def collapse_sections(
+        df:pd.DataFrame, 
+        out_path:str, 
+        prefix:str='sectioned_'
+    )->pd.DataFrame:
+    """
+    Given df from passages_to_df(), collapses the section into a single text block.
+
+    PARAMS
+    -----
+
+    """
+
+    ### PRECONDITIONS
+    # dtypes
+    assert isinstance(df, pd.DataFrame), f'df must be a dataframe: {df}'
+    assert_path(out_path)
+    assert isinstance(prefix, str), \
+        f'prefix must be a string: {prefix}'
+    # other
+    assert 'section' in df.columns, \
+        f'"section" column does not exist in df columns: {df.columns}'
+    assert 'index' in df.columns, \
+        f'"index" column does not exist in df columns: {df.columns}'
+    assert 'sentence' in df.columns, \
+        f'"sentence" column does not exist in df columns: {df.columns}'
+    assert 'pmid' in df.columns, \
+        f'"pmid" column does not exist in df columns: {df.columns}'
+    
+    ### MAIN FUNCTION
+
+    # get pmid
+    assert df['pmid'].nunique()==1, \
+        f'all pmids should be the same: {df["pmid"].unique()}'
+    id = df['pmid'].unique()[0]
+
+    # init dict
+    dict_dfs = {}
+
+    # group by section
+    grouped = df.groupby('section')
+
+    for sec in grouped:
+        # verbose
+        #print(sec[0])
+        # sentences in order
+        section_rows = sec[1].sort_values(by='index', ascending=True)
+        # join the text
+        section_rows['text'] = (' '.join(section_rows['sentence']))
+        # remove rows (only need 1)
+        section_rows = section_rows.drop_duplicates(subset=['text', 'section', ])
+        # drop some cols
+        section_rows = section_rows.drop(['index', 'sentence'], axis=1)
+        # reset index
+        section_rows = section_rows.reset_index(drop=True)
+        # add to dict
+        dict_dfs[sec[0]] = section_rows
+
+    # put into one df
+    collapsed = pd.concat(dict_dfs, ignore_index=True)
+
+    # save to csv
+    collapsed.to_csv(os.path.join(out_path, f'{prefix}{id}.csv'), index=False)
+
+    return collapsed
