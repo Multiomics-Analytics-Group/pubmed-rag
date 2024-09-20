@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from ast import literal_eval
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import LabelEncoder
 import time, os
@@ -67,7 +68,7 @@ if __name__ == "__main__":
     logger.info(f"pmids are: {pmids}")
 
     # for each pmid
-    for pmid in pmids[:5]:
+    for pmid in pmids[:15]:
         
         logger.info(f"Getting pubtator3 biocjson from api for {pmid}")
         result = get_biocjson(pmid, output_path)
@@ -157,15 +158,20 @@ if __name__ == "__main__":
             )
             # store for tsne
             df_embeddings[pmid] = exploded
-        #time.sleep(1)
         else:
             f'Result for {pmid} was None.'
 
+        time.sleep(1)
+
     # GENERATE tsne
+    logger.info("Generating tsne")
     all_dfs = pd.concat(df_embeddings.values(), ignore_index=True)
+    #all_dfs['embedding'] = all_dfs['embedding'].apply(literal_eval)
+    all_dfs['embedding'] = all_dfs['embedding'].apply(lambda x: np.array(x))
+
     # Perform t-SNE
     tsne = TSNE(n_components=2, random_state=42, )
-    entity_embeddings_2d = tsne.fit_transform(all_dfs['embedding'])
+    entity_embeddings_2d = tsne.fit_transform(np.vstack(all_dfs['embedding']))
 
     # Get labels
     label_encoder = LabelEncoder()
@@ -189,7 +195,7 @@ if __name__ == "__main__":
     plt.title('t-SNE Visualization of Embeddings by section')
     plt.xlabel('Component 1')
     plt.ylabel('Component 2')
-    plt.savefig(os.join(output_path, 'tsne.png'))
+    plt.savefig(os.path.join(output_path, 'tsne.png'))
 
     logger.info('Complete.')
 
