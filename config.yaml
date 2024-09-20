@@ -1,2 +1,3 @@
 pmid file path: 'notebooks/data/test_pmid_list.csv'
 biocjson output path: biocjson
+max_tokens: 350
