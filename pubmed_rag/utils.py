@@ -67,6 +67,14 @@ def assert_nonempty_vals(dictionary:dict):
 
 
 # other
+def get_chunks(lst, n):
+    """
+    Yield successive n-sized chunks from lst.
+    https://stackoverflow.com/questions/312443/how-do-i-split-a-list-into-equally-sized-chunks
+    """
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
+
 def get_basename(fname:None|str=None)->str:
     """
     - For a given filename, returns basename WITHOUT file extension
