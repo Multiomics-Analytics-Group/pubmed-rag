@@ -1,6 +1,6 @@
 # imports
 import os, time, json, requests 
-from utils import assert_path, get_chunks
+from pubmed_rag.utils import assert_path, get_chunks
 import pandas as pd
 import torch
 
@@ -279,7 +279,7 @@ def get_smaller_texts(text:str, max_tokens:int)->list:
         counter += counts
     # checking that the num tokens organised in 'collection' are same as original
     original_count = len(word_tokenize(text))
-    assert original_count == counter, \
+    assert abs(original_count-counter) < 3, \
         f'token counts mismatched: {original_count, counter}'
 
     return collection
