@@ -67,7 +67,7 @@ if __name__ == "__main__":
     logger.info(f"pmids are: {pmids}")
 
     # for each pmid
-    for pmid in pmids:
+    for pmid in pmids[:5]:
         
         logger.info(f"Getting pubtator3 biocjson from api for {pmid}")
         result = get_biocjson(pmid, output_path)
