@@ -1,6 +1,9 @@
 # import 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.manifold import TSNE
+from sklearn.preprocessing import LabelEncoder
 import time, os
 from transformers import AutoTokenizer, AutoModel
 import torch
@@ -158,7 +161,35 @@ if __name__ == "__main__":
         else:
             f'Result for {pmid} was None.'
 
-    #
+    # GENERATE tsne
+    all_dfs = pd.concat(df_embeddings.values(), ignore_index=True)
+    # Perform t-SNE
+    tsne = TSNE(n_components=2, random_state=42, )
+    entity_embeddings_2d = tsne.fit_transform(all_dfs['embedding'])
+
+    # Get labels
+    label_encoder = LabelEncoder()
+    sections_enc = label_encoder.fit_transform(all_dfs['section'])
+
+    # Plot the embeddings
+    plt.figure(figsize=(5, 5))
+    scatter = plt.scatter(
+        entity_embeddings_2d[:, 0], 
+        entity_embeddings_2d[:, 1], 
+        alpha=0.5, 
+        c=sections_enc, 
+    )
+    # Mapping encoded labels back to original labels in the legend
+    handles, _ = scatter.legend_elements()
+    original_labels = label_encoder.inverse_transform(range(len(handles)))
+
+    # Add a legend with the original (non-encoded) labels
+    plt.legend(handles, original_labels, title="sections")
+
+    plt.title('t-SNE Visualization of Embeddings by section')
+    plt.xlabel('Component 1')
+    plt.ylabel('Component 2')
+    plt.savefig(os.join(output_path, 'tsne.png'))
 
     logger.info('Complete.')
 
