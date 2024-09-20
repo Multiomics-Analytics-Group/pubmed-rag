@@ -2,6 +2,9 @@
 import numpy as np
 import pandas as pd
 import time, os
+from transformers import AutoTokenizer, AutoModel
+import torch
+import torch.nn.functional as F
 from pubmed_rag.utils import (
     get_basename,
     generate_log_filename,
@@ -16,7 +19,8 @@ from pubmed_rag.bioc import (
     collapse_sections,
     get_smaller_texts, 
     get_biocjson,
-    passages_to_df
+    passages_to_df, 
+    mean_pooling
 )
 
 if __name__ == "__main__":
@@ -44,11 +48,13 @@ if __name__ == "__main__":
     pmid_path = config['pmid file path']
     output_path = config['biocjson output path']
     max_tokens = config['max_tokens']
+    chosen_model = config['transformer_model']
     logger.info(f'Configuration: {config}')
 
     ## MAIN
-    logger.info(f"Preparing embedding model: {}")
-    
+    logger.info(f"Preparing embedding model: {chosen_model}")
+
+
 
     logger.info(f'Reading in pmids list from file: {pmid_path} ...')
     df = pd.read_csv(pmid_path, header=None)
