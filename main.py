@@ -52,9 +52,11 @@ if __name__ == "__main__":
     logger.info(f'Configuration: {config}')
 
     ## MAIN
-    logger.info(f"Preparing embedding model: {chosen_model}")
+    df_embeddings = {}
 
-
+    logger.info(f"Loading model {chosen_model} from HuggingFace")
+    tokenizer = AutoTokenizer.from_pretrained(chosen_model)
+    model = AutoModel.from_pretrained(chosen_model)
 
     logger.info(f'Reading in pmids list from file: {pmid_path} ...')
     df = pd.read_csv(pmid_path, header=None)
@@ -108,14 +110,55 @@ if __name__ == "__main__":
             exploded.to_csv(
                 os.path.join(
                     output_path, 
-                    f'sectioned_{pmid}.csv',
-                    index=False
-                )
+                    f'sectioned_{pmid}.csv'
+                ),
+                index=False
             )
 
-            # get embeddings 
+            # GET EMBEDDINGS
+            logger.info(f"Getting embeddings for {pmid}")
+            # Tokenize sentences
+            encoded_input = tokenizer(
+                exploded['text'].to_list(), 
+                padding=True, 
+                truncation=False, 
+                return_tensors='pt'
+            )
 
-        time.sleep(1)
+            # Compute token embeddings
+            with torch.no_grad():
+                model_output = model(**encoded_input)
+
+            # Perform pooling
+            sentence_embeddings = mean_pooling(
+                model_output, 
+                encoded_input['attention_mask']
+            )
+
+            # Normalize embeddings
+            sentence_embeddings = F.normalize(sentence_embeddings, p=2, dim=1)            
+
+            # append back to df
+            exploded['embedding'] = pd.Series(
+                sentence_embeddings.detach().numpy().tolist()
+            )
+
+            # save to csv
+            logger.info(f"Saving embeddings to {output_path}")
+            exploded.to_csv(
+                os.path.join(
+                    output_path, 
+                    f'embed_{pmid}.csv'
+                ),
+                index=False
+            )
+            # store for tsne
+            df_embeddings[pmid] = exploded
+        #time.sleep(1)
+        else:
+            f'Result for {pmid} was None.'
+
+    #
 
     logger.info('Complete.')
 
