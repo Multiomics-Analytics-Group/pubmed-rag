@@ -1,7 +1,12 @@
 # imports
 import os, time, json, requests 
-from utils import assert_path
+from utils import assert_path, get_chunks
 import pandas as pd
+
+import nltk
+nltk.download('punkt_tab')
+from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.tokenize.treebank import TreebankWordDetokenizer
 
 def get_biocjson(id:str, out_path:str, prefix:str='biocjson_', wait:int|float=0)->dict:
     """
@@ -191,3 +196,89 @@ def collapse_sections(
     collapsed.to_csv(os.path.join(out_path, f'{prefix}{id}.csv'), index=False)
 
     return collapsed
+
+
+def get_smaller_texts(text:str, max_tokens:int)->list:
+    '''
+    Splits text up into smaller strings with tokens up to max_tokens, keeping sentences whole if possible. 
+    Will split up sentences if max_tokens is really small.
+
+    :param text: The larger string to break up into smaller substrings.
+    :type text: str
+    :param max_tokens: The maximum number of tokens that each substring should have (does not account for special tokens of course)
+    :type max_tokens: int
+    :returns: The smaller substrings as a list.
+    :rtype: list
+    '''
+
+    ### PRECONDITION CHECKS
+    assert isinstance(text, str), f"text must be a string: {text}"
+    assert len(text)>0, f"text should not be an empty string: {text}"
+    assert isinstance(max_tokens, int), f"max_tokens must be an integer: {max_tokens}"
+    assert max_tokens>0, f"max_tokens must not be 0: {max_tokens}"
+
+    ### MAIN FUNCTION
+    # init
+    collection = []
+    all_words = []
+    len_text = 0
+    reverser = TreebankWordDetokenizer()
+    # separate sentences
+    sentences = sent_tokenize(text)
+    # for each sentence
+    for i, sent in enumerate(sentences):
+        # check
+        assert len_text <= max_tokens, \
+            f'something went wrong, len_text longer than max_tokens: {i, len_text, max_tokens}'
+
+        # get the number of tokens
+        words = word_tokenize(sent)
+        num_tokens = len(words)
+
+        if (len_text + num_tokens) <= max_tokens: 
+            # add the words to the 
+            all_words += words.copy()
+
+        else:
+            # if not empty add words to the collection
+            if len_text>0:
+                to_str = reverser.detokenize(all_words)
+                collection.append(to_str.strip())
+
+            # init new list of words
+            all_words = words.copy()
+
+            if num_tokens > max_tokens:
+                broken_sentence = get_chunks(words, max_tokens)
+
+                for slice in broken_sentence:
+
+                    # go from list of tokens back to str ..
+                    if len(slice)>0:
+                        to_str = reverser.detokenize(slice)
+                        collection.append(to_str.strip())
+
+                # reset
+                all_words = []
+        
+        len_text = len(all_words)
+
+    # adding whatever is left
+    if len_text>0:
+        to_str = reverser.detokenize(all_words)
+        collection.append(to_str.strip())
+
+    ### POSTCONDITIONALS
+    # checking that each substring in the collection is not over max_tokens
+    counter = 0
+    for each in collection:
+        counts = len(word_tokenize(each))
+        assert counts <= max_tokens, \
+            f'{counts} Sentence has more than {max_tokens} tokens: \n {each}'
+        counter += counts
+    # checking that the num tokens organised in 'collection' are same as original
+    original_count = len(word_tokenize(text))
+    assert original_count == counter, \
+        f'token counts mismatched: {original_count, counter}'
+
+    return collection
