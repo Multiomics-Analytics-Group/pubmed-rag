@@ -194,13 +194,15 @@ def init_log(filename:str, display:bool=False, logger_id:str|None=None):
 
     # logger configuration
     logging.basicConfig(
-        level=logging.DEBUG, 
+        #level=logging.DEBUG, 
         format='[%(asctime)s] %(name)s: %(levelname)s - %(message)s',
         handlers=handlers
     )
+    logging.getLogger('matplotlib.font_manager').disabled = True
 
     # instantiate the logger
     logger = logging.getLogger(logger_id)
+    logger.setLevel(logging.DEBUG)
 
     return logger
 
