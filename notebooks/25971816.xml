@@ -1,2 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><OAI-PMH
-	xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2024-08-28T19:33:56Z</responseDate><request>https:/www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi</request><error code="idDoesNotExist">The value of the identifier argument is unknown or illegal in this repository.</error></OAI-PMH>
