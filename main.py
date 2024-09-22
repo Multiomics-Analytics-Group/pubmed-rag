@@ -68,7 +68,7 @@ if __name__ == "__main__":
     logger.info(f"pmids are: {pmids}")
 
     # for each pmid
-    for i, pmid in enumerate(pmids[38:39]):
+    for i, pmid in enumerate(pmids):
         
         logger.info(f"Getting pubtator3 biocjson from api for {i}: {pmid}")
         result = get_biocjson(pmid, output_path)
@@ -189,7 +189,7 @@ if __name__ == "__main__":
     sections_enc = label_encoder.fit_transform(all_dfs['section'])
 
     # Plot the embeddings
-    plt.figure(figsize=(5, 5))
+    plt.figure()
     scatter = plt.scatter(
         entity_embeddings_2d[:, 0], 
         entity_embeddings_2d[:, 1], 
