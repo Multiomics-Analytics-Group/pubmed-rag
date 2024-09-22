@@ -84,7 +84,7 @@ if __name__ == "__main__":
     logger.info(f"Number of embeddings is: {len(data)}")
 
     # put data into db
-    result = client.insert(collection_name="demo_collection", data=data)
+    result = client.insert(collection_name="main", data=data)
     logger.info(f"Inserted data into db: {result}")
 
     logger.info('Complete.')
