@@ -164,16 +164,24 @@ if __name__ == "__main__":
         time.sleep(1)
 
     # GENERATE tsne
-    logger.info("Generating tsne")
     # put all in one df
     all_dfs = pd.concat(df_embeddings.values(), ignore_index=True)
+    num_emb = len(all_dfs)
+    logger.info(f"Generating tsne for {num_emb} embeddings")
     # save df to csv
     all_dfs.to_csv(os.path.join(output_path, 'all_embeddings.csv'))
     #all_dfs['embedding'] = all_dfs['embedding'].apply(literal_eval)
     all_dfs['embedding'] = all_dfs['embedding'].apply(lambda x: np.array(x))
 
     # Perform t-SNE
-    tsne = TSNE(n_components=2, random_state=42, )
+    if num_emb > 50:
+        perp = 50
+    elif num_emb > 25:
+        perp = 25
+    else:
+        perp = num_emb-0.5
+
+    tsne = TSNE(n_components=2, random_state=42, perplexity=perp)
     entity_embeddings_2d = tsne.fit_transform(np.vstack(all_dfs['embedding']))
 
     # Get labels
