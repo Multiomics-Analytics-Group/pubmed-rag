@@ -165,7 +165,10 @@ if __name__ == "__main__":
 
     # GENERATE tsne
     logger.info("Generating tsne")
+    # put all in one df
     all_dfs = pd.concat(df_embeddings.values(), ignore_index=True)
+    # save df to csv
+    all_dfs.to_csv(os.path.join(output_path, 'all_embeddings.csv'))
     #all_dfs['embedding'] = all_dfs['embedding'].apply(literal_eval)
     all_dfs['embedding'] = all_dfs['embedding'].apply(lambda x: np.array(x))
 
