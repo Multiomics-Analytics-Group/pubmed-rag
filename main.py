@@ -68,9 +68,9 @@ if __name__ == "__main__":
     logger.info(f"pmids are: {pmids}")
 
     # for each pmid
-    for pmid in pmids[:15]:
+    for i, pmid in enumerate(pmids[38:39]):
         
-        logger.info(f"Getting pubtator3 biocjson from api for {pmid}")
+        logger.info(f"Getting pubtator3 biocjson from api for {i}: {pmid}")
         result = get_biocjson(pmid, output_path)
         logger.info(f"Saved to {output_path}.")
 
@@ -95,7 +95,7 @@ if __name__ == "__main__":
                 df_test['sentence']+'.'
             )
             # which sections to keep? 
-            keep_sections = ['title', 'abstract', 'intro', 'results', 'discuss', 'methods']
+            keep_sections = ['title', 'abstract', 'intro', 'results', 'discuss', 'methods', 'concl']
             # filter 
             df_filtered = df_test[df_test['section'].isin(keep_sections)]
 
@@ -125,7 +125,7 @@ if __name__ == "__main__":
             encoded_input = tokenizer(
                 exploded['text'].to_list(), 
                 padding=True, 
-                truncation=False, 
+                truncation=True, 
                 return_tensors='pt'
             )
 
