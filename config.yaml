@@ -1,5 +1,5 @@
 pmid file path: 'notebooks/data/test_pmid_list.csv'
 biocjson output path: biocjson
-max_tokens: 350
+max_tokens: 500
 transformer_model: 'sentence-transformers/all-mpnet-base-v2'
 db name: 'demo'
