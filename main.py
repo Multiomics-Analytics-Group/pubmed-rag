@@ -164,50 +164,63 @@ if __name__ == "__main__":
 
         time.sleep(1)
 
-    # GENERATE tsne
+    # SAVE ALL EMBEDDINGS IN ONE FILE
     # put all in one df
     all_dfs = pd.concat(df_embeddings.values(), ignore_index=True)
     num_emb = len(all_dfs)
-    logger.info(f"Generating tsne for {num_emb} embeddings")
+    out_all_emb_fpath = os.path.join(output_path, 'all_embeddings.csv')
+    logger.info(f"Saving all {num_emb} embeddings to: {out_all_emb_fpath}")
     # save df to csv
-    all_dfs.to_csv(os.path.join(output_path, 'all_embeddings.csv'))
-    #all_dfs['embedding'] = all_dfs['embedding'].apply(literal_eval)
-    all_dfs['embedding'] = all_dfs['embedding'].apply(lambda x: np.array(x))
+    all_dfs.to_csv(out_all_emb_fpath)
 
-    # Perform t-SNE
-    if num_emb > 50:
-        perp = 50
-    elif num_emb > 25:
-        perp = 25
+    # if nonempty string / not False
+    if tsne_fpath:
+        # GENERATE tsne
+        logger.info(f"Generating tsne for {num_emb} embeddings")
+        
+        # testing 
+        # all_dfs = pd.read_csv(os.path.join(output_path, 'all_embeddings.csv'), )
+        # all_dfs['embedding'] = all_dfs['embedding'].apply(literal_eval)
+        # all_dfs['embedding'] = all_dfs['embedding'].apply(lambda x: np.array(x))
+        # num_emb = len(all_dfs)
+
+        # perplexity must be less than n_samples
+        if num_emb > 50:
+            perp = 50
+        elif num_emb > 25:
+            perp = 25
+        else:
+            perp = num_emb-0.5
+
+        # Perform t-SNE
+        tsne = TSNE(n_components=2, random_state=42, perplexity=perp)
+        entity_embeddings_2d = tsne.fit_transform(np.vstack(all_dfs['embedding']))
+
+        # Get labels
+        label_encoder = LabelEncoder()
+        sections_enc = label_encoder.fit_transform(all_dfs['section'])
+
+        # Plot the embeddings
+        plt.figure()
+        scatter = plt.scatter(
+            entity_embeddings_2d[:, 0], 
+            entity_embeddings_2d[:, 1], 
+            alpha=0.5, 
+            c=sections_enc, 
+        )
+        # Mapping encoded labels back to original labels in the legend
+        handles, _ = scatter.legend_elements()
+        original_labels = label_encoder.inverse_transform(range(len(handles)))
+
+        # Add a legend with the original (non-encoded) labels
+        plt.legend(handles, original_labels, title="sections")
+
+        plt.title('t-SNE Visualization of Embeddings by section')
+        plt.xlabel('Component 1')
+        plt.ylabel('Component 2')
+        plt.savefig(tsne_fpath)
     else:
-        perp = num_emb-0.5
-
-    tsne = TSNE(n_components=2, random_state=42, perplexity=perp)
-    entity_embeddings_2d = tsne.fit_transform(np.vstack(all_dfs['embedding']))
-
-    # Get labels
-    label_encoder = LabelEncoder()
-    sections_enc = label_encoder.fit_transform(all_dfs['section'])
-
-    # Plot the embeddings
-    plt.figure()
-    scatter = plt.scatter(
-        entity_embeddings_2d[:, 0], 
-        entity_embeddings_2d[:, 1], 
-        alpha=0.5, 
-        c=sections_enc, 
-    )
-    # Mapping encoded labels back to original labels in the legend
-    handles, _ = scatter.legend_elements()
-    original_labels = label_encoder.inverse_transform(range(len(handles)))
-
-    # Add a legend with the original (non-encoded) labels
-    plt.legend(handles, original_labels, title="sections")
-
-    plt.title('t-SNE Visualization of Embeddings by section')
-    plt.xlabel('Component 1')
-    plt.ylabel('Component 2')
-    plt.savefig(os.path.join(output_path, 'tsne.png'))
+        logger.info(f"No tsne filepath provided in config file. Tsne plot not generated.")
 
     logger.info('Complete.')
 
