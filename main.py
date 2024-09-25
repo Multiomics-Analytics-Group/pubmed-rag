@@ -219,6 +219,7 @@ if __name__ == "__main__":
         plt.xlabel('Component 1')
         plt.ylabel('Component 2')
         plt.savefig(tsne_fpath)
+        logger.info(f"Tsne plot saved to {tsne_fpath}")
     else:
         logger.info(f"No tsne filepath provided in config file. Tsne plot not generated.")
 
