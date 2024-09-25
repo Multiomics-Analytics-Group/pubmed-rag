@@ -53,6 +53,7 @@ if __name__ == "__main__":
     output_path = config['biocjson output path']
     max_tokens = config['max_tokens']
     chosen_model = config['transformer_model']
+    tsne_fpath = config['tsne']
     logger.info(f'Configuration: {config}')
 
     ## MAIN
