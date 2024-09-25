@@ -11,24 +11,21 @@ from nltk.tokenize.treebank import TreebankWordDetokenizer
 
 def get_biocjson(id:str, out_path:str, prefix:str='biocjson_', wait:int|float=0)->dict:
     """
-    Given a pmid or pmcid retrieves full text (if available) or abstract only from PubMed/Central
+    Retrieves full text (if available) or abstract only from PubMed/Central given a PMID or PMCID.
 
-    PARAMS
-    -----
-    - id (str): must be a pmid or pmcid
-    - out_path (str): where to save the json files
-    - prefix (str): a prefix for the json filenames
-    - wait (int): how many seconds to wait between each request
+    :param id: A string representing the PubMed ID (PMID) or PubMed Central ID (PMCID).
+    :type id: str
+    :param out_path: The directory path where JSON files will be saved.
+    :type out_path: str
+    :param prefix: A prefix for the JSON filenames.
+    :type prefix: str
+    :param wait: The number of seconds to wait between each request.
+    :type wait: int
 
-    OUTPUTS
-    -----
-    - json to the out_path
-    - new_result (dict): the files in a dictionary where the keys are the pmid id and values are biocjson
-
-    EXAMPLES
-    -----
-    TODO
-
+    :returns: 
+        - JSON files saved to the specified out_path.
+        - A dictionary where keys are the PMID/PMCID and values are BioC JSON data.
+    :rtype: dict
     """
 
     ### PRECONDITIONS
