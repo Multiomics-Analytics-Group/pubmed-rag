@@ -64,24 +64,21 @@ def get_biocjson(id:str, out_path:str, prefix:str='biocjson_', wait:int|float=0)
 
 def passages_to_df(result:dict, out_path:str, prefix:str='df_')->pd.DataFrame:
     """
-    Given a biocjson result from get_biocjson() parses to return df of sentences with metadata
+    Parses a BioC JSON result from get_biocjson() and returns a DataFrame of sentences with metadata.
 
-    PARAMS
-    -----
-    - result (dict): from get_biocjson()
-    - out_path (str): where to save the json files
-    - prefix (str): a prefix for the json filenames
+    :param result: A dictionary containing the BioC JSON result from get_biocjson().
+    :type result: dict
+    :param out_path: The directory path where the CSV files will be saved.
+    :type out_path: str
+    :param prefix: A prefix for the CSV filenames.
+    :type prefix: str
 
-    OUTPUTS
-    -----
-    - df csv to the out_path
-    - df (pd.DataFrame): each observation is a sentence with meta data
-
-    EXAMPLES
-    -----
-    TODO
-
+    :returns:
+        - A CSV file saved to the specified out_path.
+        - A pandas DataFrame where each row represents a sentence with associated metadata.
+    :rtype: pd.DataFrame
     """
+
     ### PRECONDITIONS
     assert isinstance(result, dict), f"result must be a dict: {result}"
     assert_path(out_path)
