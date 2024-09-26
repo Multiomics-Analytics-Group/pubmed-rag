@@ -14,8 +14,11 @@ A playground for RAG development from pubmed API (starting with bkg-review proje
 ## Retrieving the pubmed articles
 
 run `python get_embeddings.py <path to config file>`
-    e.g. `python get_embeddings.py config.yaml`
+    e.g. `python get_embeddings.py demo/config.yaml`
 
 ## Putting the embeddings into a vector database
 run `python create_db.py <path to config file>`
+    e.g. `python create_db.py demo/config/yaml`
+
+
 
