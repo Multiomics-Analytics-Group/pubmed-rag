@@ -11,4 +11,11 @@ A playground for RAG development from pubmed API (starting with bkg-review proje
 3. Set up environment by running `poetry install`
 4. activate the environment by running `poetry shell`
 
-## 
+## Retrieving the pubmed articles
+
+run `python get_embeddings.py <path to config file>`
+    e.g. `python get_embeddings.py config.yaml`
+
+## Putting the embeddings into a vector database
+run `python create_db.py <path to config file>`
+
