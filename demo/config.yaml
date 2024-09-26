@@ -1,0 +1,7 @@
+pmid file path: 'demo/demo_pmids.csv'
+biocjson output path: demo/output
+max_tokens: 500
+transformer_model: 'sentence-transformers/all-mpnet-base-v2'
+db name: '/demo/demo.db'
+tsne: 'demo/tsne.png' #or empty string or False if no tsne wanted
+n_results: 10
