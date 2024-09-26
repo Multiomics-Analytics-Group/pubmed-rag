@@ -125,7 +125,8 @@ def passages_to_df(result:dict, out_path:str, prefix:str='df_')->pd.DataFrame:
     df.to_csv(os.path.join(out_path, f'{prefix}{id}.csv'), index=False)
 
     return df
-    
+
+
 def collapse_sections(
         df:pd.DataFrame, 
         out_path:str, 
@@ -278,9 +279,3 @@ def get_smaller_texts(text:str, max_tokens:int)->list:
 
     return collection
 
-
-#Mean Pooling - Take attention mask into account for correct averaging
-def mean_pooling(model_output, attention_mask):
-    token_embeddings = model_output[0] #First element of model_output contains all token embeddings
-    input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
-    return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
