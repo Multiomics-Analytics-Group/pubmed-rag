@@ -60,7 +60,7 @@ if __name__ == "__main__":
     ## MAIN
     logger.info(f"Creating {db_name} in current dir {os.getcwd}")
 
-    client = MilvusClient(f'{db_name}.db')
+    client = MilvusClient(f'{db_name}')
     if client.has_collection(collection_name="main"):
         client.drop_collection(collection_name="main")
     client.create_collection(

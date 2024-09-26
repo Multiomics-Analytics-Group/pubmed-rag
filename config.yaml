@@ -2,6 +2,6 @@ pmid file path: 'notebooks/data/test_pmid_list.csv'
 biocjson output path: biocjson
 max_tokens: 500
 transformer_model: 'sentence-transformers/all-mpnet-base-v2'
-db name: 'demo'
+db name: 'demo.db'
 tsne: 'tsne.png' #or empty string or False if no tsne wanted
 n_results: 10
