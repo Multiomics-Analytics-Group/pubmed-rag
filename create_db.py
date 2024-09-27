@@ -1,38 +1,35 @@
 # import 
-import numpy as np
+import argparse
 import pandas as pd
-import matplotlib.pyplot as plt
 from ast import literal_eval
-from sklearn.manifold import TSNE
-from sklearn.preprocessing import LabelEncoder
-import time, os
-from transformers import AutoTokenizer, AutoModel
-import torch
-import torch.nn.functional as F
+import os
 from pymilvus import MilvusClient
 from pubmed_rag.utils import (
     get_basename,
     generate_log_filename,
     init_log,
-    get_config_path,
     config_loader,
     assert_nonempty_keys,
     assert_nonempty_vals,
 )
 
-from pubmed_rag.bioc import (
-    collapse_sections,
-    get_smaller_texts, 
-    get_biocjson,
-    passages_to_df, 
-    mean_pooling
-)
-
 if __name__ == "__main__":
+
+    ## GET ARGS
+    # init
+    parser = argparse.ArgumentParser(
+        prog='get sentence embeddings',
+    )
+    parser.add_argument(
+        '-c', '--config', 
+        action='store',
+        default='demo/config.yaml'
+        )
+    args = parser.parse_args()
 
     ## START LOG FILE 
     # get log suffix, which will be the current script's base file name
-    log_suffix = get_basename()
+    log_suffix = get_basename(args.config)
     # generate log file name
     log_file = generate_log_filename(suffix=log_suffix)
     # init logger
@@ -42,7 +39,7 @@ if __name__ == "__main__":
 
     ## LOAD CONFIG PARAMETERS
     # getting the config filepath
-    config_filepath = get_config_path()
+    config_filepath = args.config
     # log it
     logger.info(f'Path to config file: {config_filepath}')
     # load config params
