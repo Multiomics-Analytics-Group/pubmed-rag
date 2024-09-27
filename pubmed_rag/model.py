@@ -29,8 +29,8 @@ def get_tokens(
     """
     Uses a tokenizer for a given model from Hugging Face to encode a list of sentences.
 
-    :param tokenizer: The model name from Hugging Face
-    :type tokenizer: str
+    :param tokenizer: Tokenizer for a given model loaded from Hugging Face
+    :type tokenizer: A transformers class
     :param input: A list of sentences to be embedded 
     :param type: list
     :param tokenizer_kwargs: Additional parameters to pass for
@@ -51,9 +51,6 @@ def get_tokens(
     
     # MAIN FUNCTION
 
-    # load the tokenizer
-    #tokenizer = AutoTokenizer.from_pretrained(model_name)
-
     # get tokens
     encoded_input = tokenizer(
         input, 
@@ -64,15 +61,15 @@ def get_tokens(
 
 
 def get_sentence_embeddings(
-        model_name:str, 
+        model:transformers.AutoModel, 
         encoded_input:transformers.BatchEncoding,
         )->torch.Tensor:
     """
     Uses a given model from Hugging Face to embed a list of sentences
     that have been encoded by pubmed_rag.model.get_tokens()
 
-    :param model_name: The model name from Hugging Face
-    :type model_name: str
+    :param model: The model loaded from Hugging Face
+    :type model: transformers.AutoModel
     :param encoded_input: A list of sentences to be embedded 
     :type encoded_input: transformers.BatchEncoding
     
@@ -81,13 +78,10 @@ def get_sentence_embeddings(
     """
 
     # PRECONDITION CHECKS
-    assert isinstance(model_name, str), f"model_name must be a str: {model_name}"
     assert isinstance(encoded_input, transformers.BatchEncoding), \
         f"tokens must be a transformers.BatchEncoding: {encoded_input}"
 
     # MAIN FUNCTION
-    # load the model
-    model = AutoModel.from_pretrained(model_name)
 
     # Compute token embeddings
     with torch.no_grad():
