@@ -23,7 +23,7 @@ if __name__ == "__main__":
     ## GET ARGS
     # init
     parser = argparse.ArgumentParser(
-        prog='run_query',
+        prog='run_search',
         description='gets config path and query'
     )
     parser.add_argument(
