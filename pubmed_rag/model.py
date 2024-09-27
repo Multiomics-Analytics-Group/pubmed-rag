@@ -3,7 +3,6 @@ import os, time, json, requests
 from pubmed_rag.utils import assert_path, get_chunks
 import pandas as pd
 import transformers
-from transformers import AutoTokenizer, AutoModel
 import torch
 import torch.nn.functional as F
 

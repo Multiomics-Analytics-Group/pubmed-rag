@@ -24,7 +24,11 @@ from pubmed_rag.bioc import (
     get_smaller_texts, 
     get_biocjson,
     passages_to_df, 
-    mean_pooling
+)
+
+from pubmed_rag.model import (
+    get_tokens,
+    get_sentence_embeddings
 )
 
 if __name__ == "__main__":
@@ -123,25 +127,16 @@ if __name__ == "__main__":
             # GET EMBEDDINGS
             logger.info(f"Getting embeddings for {pmid}")
             # Tokenize sentences
-            encoded_input = tokenizer(
-                exploded['text'].to_list(), 
-                padding=True, 
-                truncation=True, 
-                return_tensors='pt'
+            encoded_input = get_tokens(
+                tokenizer,
+                exploded['text'].to_list()
             )
 
-            # Compute token embeddings
-            with torch.no_grad():
-                model_output = model(**encoded_input)
-
-            # Perform pooling
-            sentence_embeddings = mean_pooling(
-                model_output, 
-                encoded_input['attention_mask']
-            )
-
-            # Normalize embeddings
-            sentence_embeddings = F.normalize(sentence_embeddings, p=2, dim=1)            
+            # get embeddings
+            sentence_embeddings = get_sentence_embeddings(
+                model,
+                encoded_input
+            )           
 
             # append back to df
             exploded['embedding'] = pd.Series(
