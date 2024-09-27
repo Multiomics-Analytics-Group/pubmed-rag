@@ -31,4 +31,12 @@ def get_tokens(
     :rtype: torch.Tensor
     """
 
+    # PRECONDITION CHECKS
+    assert isinstance(model_name, str), f"model_name must be a str: {model_name}"
+    assert isinstance(input, list), f"input must be a list of strings {input}"
+    for item in input:
+        assert isinstance(item, str), \
+            f"input must be a list of strings: {item} is not str"
+    assert isinstance(tokenizer_kwargs, dict), \
+        f"tokenizer_kwargs must be a dict: {tokenizer_kwargs}"    
     
