@@ -58,11 +58,11 @@ if __name__ == "__main__":
     logger.info(f"Creating {db_name}")
 
     client = MilvusClient(f'{db_name}')
-    if client.has_collection(collection_name="main"):
+    if client.has_collection(collection_name="main"):#TODO add to config?
         client.drop_collection(collection_name="main")
     client.create_collection(
         collection_name="main",
-        dimension=768,  # The vectors we will use in this demo has 768 dimensions
+        dimension=768,  #TODO this depends on the model, so need to add to config
     )
 
     logger.info(f'Reading in embeddings from folder: {output_path} ...')
