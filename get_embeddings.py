@@ -2,13 +2,10 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from ast import literal_eval
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import LabelEncoder
 import time, os
 from transformers import AutoTokenizer, AutoModel
-import torch
-import torch.nn.functional as F
 from pubmed_rag.utils import (
     get_basename,
     generate_log_filename,
@@ -221,4 +218,4 @@ if __name__ == "__main__":
     logger.info('Complete.')
 
 else:
-    print('main.py imported. scholarly queries not initiated.')
+    print('get_embeddings.py imported. Script not ran.')

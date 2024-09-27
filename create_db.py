@@ -90,4 +90,4 @@ if __name__ == "__main__":
     logger.info('Complete.')
 
 else:
-    print('create_db.py imported. scholarly queries not initiated.')
+    print('create_db.py imported. Script not ran.')
