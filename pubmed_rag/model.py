@@ -18,7 +18,7 @@ def mean_pooling(model_output, attention_mask):
 
 
 def get_tokens(
-        model_name:str, 
+        tokenizer:transformers.AutoTokenizer, 
         input:list,
         tokenizer_kwargs:dict=dict(
             padding=True, 
@@ -29,8 +29,8 @@ def get_tokens(
     """
     Uses a tokenizer for a given model from Hugging Face to encode a list of sentences.
 
-    :param model_name: The model name from Hugging Face
-    :type model_name: str
+    :param tokenizer: The model name from Hugging Face
+    :type tokenizer: str
     :param input: A list of sentences to be embedded 
     :param type: list
     :param tokenizer_kwargs: Additional parameters to pass for
@@ -40,7 +40,8 @@ def get_tokens(
     """
 
     # PRECONDITION CHECKS
-    assert isinstance(model_name, str), f"model_name must be a str: {model_name}"
+    # assert isinstance(tokenizer, transformers.AutoTokenizer), \
+    #     f"Tokenizer must be from transformers: {type(tokenizer)}"
     assert isinstance(input, list), f"input must be a list of strings {input}"
     for item in input:
         assert isinstance(item, str), \
@@ -51,7 +52,7 @@ def get_tokens(
     # MAIN FUNCTION
 
     # load the tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    #tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     # get tokens
     encoded_input = tokenizer(
