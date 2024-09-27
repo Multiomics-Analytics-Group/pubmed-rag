@@ -22,7 +22,8 @@ def get_tokens(
         tokenizer_kwargs:dict=dict(
             padding=True, 
             truncation=True, 
-            return_tensors='pt'            
+            return_tensors='pt',
+            max_length=512            
         )
         )->transformers.BatchEncoding:
     """
