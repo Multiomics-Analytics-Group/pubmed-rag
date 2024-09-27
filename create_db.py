@@ -58,7 +58,7 @@ if __name__ == "__main__":
     logger.info(f'Configuration: {config}')
 
     ## MAIN
-    logger.info(f"Creating {db_name} in current dir {os.getcwd}")
+    logger.info(f"Creating {db_name}")
 
     client = MilvusClient(f'{db_name}')
     if client.has_collection(collection_name="main"):
