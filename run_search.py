@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     ## START LOG FILE 
     # get log suffix, which will be the current script's base file name
-    log_suffix = get_basename(args.config)
+    log_suffix = get_basename()
     # generate log file name
     log_file = generate_log_filename(suffix=log_suffix)
     # init logger
