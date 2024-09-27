@@ -2,6 +2,7 @@
 import os, time, json, requests 
 from pubmed_rag.utils import assert_path, get_chunks
 import pandas as pd
+import transformers
 from transformers import AutoTokenizer, AutoModel
 import torch
 import torch.nn.functional as F
@@ -16,8 +17,12 @@ def mean_pooling(model_output, attention_mask):
 def get_tokens(
         model_name:str, 
         input:list,
-        tokenizer_kwargs:dict
-        )->torch.Tensor:
+        tokenizer_kwargs:dict=dict(
+            padding=True, 
+            truncation=True, 
+            return_tensors='pt'            
+        )
+        )->transformers.BatchEncoding:
     """
     Uses a tokenizer for a given model from Hugging Face to embed a list of sentences.
 
@@ -27,8 +32,8 @@ def get_tokens(
     :param type: list
     :param tokenizer_kwargs: Additional parameters to pass for
     
-    :returns: The encoded inputs as a tensor
-    :rtype: torch.Tensor
+    :returns: The encoded inputs that can be used as a dictionary.
+    :rtype: transformers.BatchEncoding
     """
 
     # PRECONDITION CHECKS
@@ -40,3 +45,18 @@ def get_tokens(
     assert isinstance(tokenizer_kwargs, dict), \
         f"tokenizer_kwargs must be a dict: {tokenizer_kwargs}"    
     
+    # MAIN FUNCTION
+
+    # load the tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+    # get tokens
+    encoded_input = tokenizer(
+        input, 
+        **tokenizer_kwargs
+    ) 
+
+    return encoded_input
+
+
+
