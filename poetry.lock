@@ -297,6 +297,7 @@ absl-py = ">=0.9.0"
 jax = ">=0.4.16"
 jaxlib = ">=0.1.37"
 numpy = ">=1.24.1"
+setuptools = {version = "*", markers = "python_version >= \"3.12\""}
 toolz = ">=0.9.0"
 typing-extensions = ">=4.2.0"
 
@@ -607,7 +608,10 @@ files = [
 [package.dependencies]
 jax = ">=0.4.27"
 msgpack = "*"
-numpy = {version = ">=1.23.2", markers = "python_version >= \"3.11\""}
+numpy = [
+    {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
+    {version = ">=1.23.2", markers = "python_version >= \"3.11\" and python_version < \"3.12\""},
+]
 optax = "*"
 orbax-checkpoint = "*"
 PyYAML = ">=5.4.1"
@@ -1025,9 +1029,15 @@ files = [
 [package.dependencies]
 jaxlib = ">=0.4.30,<=0.4.31"
 ml-dtypes = ">=0.2.0"
-numpy = ">=1.24"
+numpy = [
+    {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
+    {version = ">=1.24", markers = "python_version < \"3.12\""},
+]
 opt-einsum = "*"
-scipy = ">=1.10"
+scipy = [
+    {version = ">=1.11.1", markers = "python_version >= \"3.12\""},
+    {version = ">=1.10", markers = "python_version < \"3.12\""},
+]
 
 [package.extras]
 ci = ["jaxlib (==0.4.30)"]
@@ -1065,7 +1075,10 @@ files = [
 [package.dependencies]
 ml-dtypes = ">=0.2.0"
 numpy = ">=1.24"
-scipy = ">=1.10"
+scipy = [
+    {version = ">=1.11.1", markers = "python_version >= \"3.12\""},
+    {version = ">=1.10", markers = "python_version < \"3.12\""},
+]
 
 [[package]]
 name = "jedi"
@@ -1578,7 +1591,10 @@ files = [
 ]
 
 [package.dependencies]
-numpy = {version = ">=1.23.3", markers = "python_version >= \"3.11\""}
+numpy = [
+    {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
+    {version = ">=1.23.3", markers = "python_version >= \"3.11\" and python_version < \"3.12\""},
+]
 
 [package.extras]
 dev = ["absl-py", "pyink", "pylint (>=2.6.0)", "pytest", "pytest-xdist"]
@@ -2143,7 +2159,10 @@ files = [
 ]
 
 [package.dependencies]
-numpy = {version = ">=1.23.2", markers = "python_version == \"3.11\""}
+numpy = [
+    {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
+    {version = ">=1.23.2", markers = "python_version == \"3.11\""},
+]
 python-dateutil = ">=2.8.2"
 pytz = ">=2020.1"
 tzdata = ">=2022.7"
@@ -3248,7 +3267,10 @@ h5py = ">=3.10.0"
 keras = ">=3.2.0"
 libclang = ">=13.0.0"
 ml-dtypes = ">=0.3.1,<0.5.0"
-numpy = {version = ">=1.23.5,<2.0.0", markers = "python_version <= \"3.11\""}
+numpy = [
+    {version = ">=1.26.0,<2.0.0", markers = "python_version >= \"3.12\""},
+    {version = ">=1.23.5,<2.0.0", markers = "python_version <= \"3.11\""},
+]
 opt-einsum = ">=2.3.2"
 packaging = "*"
 protobuf = ">=3.20.3,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
@@ -4045,5 +4067,5 @@ type = ["pytest-mypy"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.11,<3.12"
-content-hash = "4aa59486e19c485b2ec1a60a82fff90b8f13145fb1a61613834c1c26cb38fac1"
+python-versions = "^3.11"
+content-hash = "aca5c3d700502ea8062101e442bcb798c0dfd1d9ab38fd1416e2167a735087b8"
