@@ -109,7 +109,7 @@ if __name__ == "__main__":
                 df_test['sentence']+'.'
             )
             # which sections to keep? 
-            keep_sections = ['title', 'abstract', 'intro', 'results', 'discuss', 'methods', 'concl']
+            keep_sections = ['abstract', 'intro', 'results', 'discuss', 'methods', 'concl']
             # filter 
             df_filtered = df_test[df_test['section'].isin(keep_sections)]
 
