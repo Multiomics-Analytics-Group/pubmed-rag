@@ -18,7 +18,7 @@ from pubmed_rag.model import (
     get_sentence_embeddings
 )
 
-def main(
+def find_similar_vectors(
         path_to_config:str,
         query:str,
         logging:bool=False
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     # log it
     logger.info(f'Path to log file: {log_file}')
 
-    result = main(
+    result = find_similar_vectors(
         path_to_config=args.config,
         query=args.query,
         logging=True, 
