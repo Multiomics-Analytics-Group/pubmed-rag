@@ -5,3 +5,4 @@ transformer_model: 'microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltex
 db name: '/users/anglup/github/pubmed-rag/demo.db'
 tsne: 'tsne.png' #or empty string or False if no tsne wanted
 n_results: 10
+output_dimensions: 768

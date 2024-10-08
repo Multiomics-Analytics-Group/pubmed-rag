@@ -52,6 +52,7 @@ if __name__ == "__main__":
     max_tokens = config['max_tokens']
     chosen_model = config['transformer_model']
     db_name = config['db name']
+    out_dim = config['output_dimensions']
     logger.info(f'Configuration: {config}')
 
     ## MAIN
@@ -62,7 +63,7 @@ if __name__ == "__main__":
         client.drop_collection(collection_name="main")
     client.create_collection(
         collection_name="main",
-        dimension=768,  #TODO this depends on the model, so need to add to config
+        dimension=out_dim, 
     )
 
     logger.info(f'Reading in embeddings from folder: {output_path} ...')

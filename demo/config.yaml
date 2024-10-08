@@ -12,3 +12,5 @@ db name: 'demo/demo.db'
 tsne: demo/tsne.png 
 # number of nearest vector results to return during search/query
 n_results: 10
+# the pre-trained model's output dimensions e.g., 768 for many LLMs
+output_dimensions: 768
