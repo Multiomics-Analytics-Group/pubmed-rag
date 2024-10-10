@@ -112,6 +112,8 @@ if __name__ == "__main__":
             keep_sections = ['abstract', 'intro', 'results', 'discuss', 'methods', 'concl']
             # filter 
             df_filtered = df_test[df_test['section'].isin(keep_sections)].copy()
+            df_filtered = df_filtered[df_filtered['sentence'].apply(lambda x: len(x.split())>5)]
+            df_filtered = df_filtered.drop('index', axis=1)
 
             # # grouping by section
             # logger.info(f"Grouping by section...")
@@ -125,16 +127,18 @@ if __name__ == "__main__":
             #     collapsed.at[i, 'text'] = smaller
             # exploded = collapsed.explode('text')
             # # fix this later, want ot save over section
-            # exploded.to_csv(
-            #     os.path.join(
-            #         output_path, 
-            #         f'sectioned_{pmid}.csv'
-            #     ),
-            #     index=False
-            # )
+            df_filtered.to_csv(
+                os.path.join(
+                    output_path, 
+                    f'sectioned_{pmid}.csv'
+                ),
+                index=False,
+                sep='\t'    
+            )
 
             # GET EMBEDDINGS
             logger.info(f"Getting embeddings for {pmid}")
+
             # Tokenize sentences
             encoded_input = get_tokens(
                 tokenizer,
@@ -146,13 +150,13 @@ if __name__ == "__main__":
             sentence_embeddings = get_sentence_embeddings(
                 model,
                 encoded_input
-            )           
+            ) 
 
             # append back to df
             df_filtered['embedding'] = pd.Series(
             #exploded['embedding'] = pd.Series(
                 sentence_embeddings.detach().numpy().tolist()
-            )
+            ).values
 
             # save to csv
             logger.info(f"Saving embeddings to {output_path}")
@@ -162,7 +166,8 @@ if __name__ == "__main__":
                     output_path, 
                     f'embed_{pmid}.csv'
                 ),
-                index=False
+                index=False,
+                sep='\t'
             )
             # store for tsne
             df_embeddings[pmid] = df_filtered#exploded
@@ -178,7 +183,7 @@ if __name__ == "__main__":
     out_all_emb_fpath = os.path.join(output_path, 'all_embeddings.csv')
     logger.info(f"Saving all {num_emb} embeddings to: {out_all_emb_fpath}")
     # save df to csv
-    all_dfs.to_csv(out_all_emb_fpath)
+    all_dfs.to_csv(out_all_emb_fpath, sep='\t')
 
     # if nonempty string / not False
     if tsne_fpath:
