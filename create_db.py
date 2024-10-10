@@ -69,7 +69,10 @@ if __name__ == "__main__":
     )
 
     logger.info(f'Reading in embeddings from folder: {output_path} ...')
-    df = pd.read_csv(os.path.join(output_path, 'all_embeddings.csv'), )
+    df = pd.read_csv(
+        os.path.join(output_path, 'all_embeddings.csv'), 
+        sep='\t'
+        )
     # rename id and vector cols
     df = df.rename(
         columns={
