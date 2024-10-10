@@ -103,42 +103,43 @@ if __name__ == "__main__":
             df_test['sentence'] = df_test['sentence'].str.strip()
             punctuations = ('!',',','.','?',',','"', "'")
             # lol adding a . to the end for now? if no punc
-            df_test['sentence'] = np.where(
-                df_test['sentence'].str.endswith(punctuations), 
-                df_test['sentence'], 
-                df_test['sentence']+'.'
-            )
+            # df_test['sentence'] = np.where(
+            #     df_test['sentence'].str.endswith(punctuations), 
+            #     df_test['sentence'], 
+            #     df_test['sentence']+'.'
+            # )
             # which sections to keep? 
             keep_sections = ['abstract', 'intro', 'results', 'discuss', 'methods', 'concl']
             # filter 
-            df_filtered = df_test[df_test['section'].isin(keep_sections)]
+            df_filtered = df_test[df_test['section'].isin(keep_sections)].copy()
 
-            # grouping by section
-            logger.info(f"Grouping by section...")
-            collapsed = collapse_sections(df_filtered, 'biocjson')
-            # smaller texts within section
-            logger.info(
-                f"Smaller texts with max {max_tokens} tokens within section..."
-            )
-            for i, section in enumerate(collapsed['text']):
-                smaller = get_smaller_texts(section, max_tokens)
-                collapsed.at[i, 'text'] = smaller
-            exploded = collapsed.explode('text')
-            # fix this later, want ot save over section
-            exploded.to_csv(
-                os.path.join(
-                    output_path, 
-                    f'sectioned_{pmid}.csv'
-                ),
-                index=False
-            )
+            # # grouping by section
+            # logger.info(f"Grouping by section...")
+            # collapsed = collapse_sections(df_filtered, 'biocjson')
+            # # smaller texts within section
+            # logger.info(
+            #     f"Smaller texts with max {max_tokens} tokens within section..."
+            # )
+            # for i, section in enumerate(collapsed['text']):
+            #     smaller = get_smaller_texts(section, max_tokens)
+            #     collapsed.at[i, 'text'] = smaller
+            # exploded = collapsed.explode('text')
+            # # fix this later, want ot save over section
+            # exploded.to_csv(
+            #     os.path.join(
+            #         output_path, 
+            #         f'sectioned_{pmid}.csv'
+            #     ),
+            #     index=False
+            # )
 
             # GET EMBEDDINGS
             logger.info(f"Getting embeddings for {pmid}")
             # Tokenize sentences
             encoded_input = get_tokens(
                 tokenizer,
-                exploded['text'].to_list()
+                df_filtered['sentence'].to_list()
+                #exploded['text'].to_list()
             )
 
             # get embeddings
@@ -148,13 +149,15 @@ if __name__ == "__main__":
             )           
 
             # append back to df
-            exploded['embedding'] = pd.Series(
+            df_filtered['embedding'] = pd.Series(
+            #exploded['embedding'] = pd.Series(
                 sentence_embeddings.detach().numpy().tolist()
             )
 
             # save to csv
             logger.info(f"Saving embeddings to {output_path}")
-            exploded.to_csv(
+            df_filtered.to_csv(
+            #exploded.to_csv(
                 os.path.join(
                     output_path, 
                     f'embed_{pmid}.csv'
@@ -162,7 +165,7 @@ if __name__ == "__main__":
                 index=False
             )
             # store for tsne
-            df_embeddings[pmid] = exploded
+            df_embeddings[pmid] = df_filtered#exploded
         else:
             f'Result for {pmid} was None.'
 

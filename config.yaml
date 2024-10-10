@@ -1,11 +1,11 @@
 # Mainly for getting the embeddings
 pmid file path: 'notebooks/data/test_pmid_list.csv'
 biocjson output path: biocjson
-max_tokens: 500
+max_tokens: 50
 transformer_model: NeuML/pubmedbert-base-embeddings 
 #'microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext' #'sentence-transformers/all-mpnet-base-v2'
 output_dimensions: 768
-tsne: 'tsne-neuml.png' #or empty string or False if no tsne wanted
+tsne: 'tsne-smaller.png' #or empty string or False if no tsne wanted
 
 
 # For creating the database
@@ -13,4 +13,4 @@ db name: '/users/anglup/github/pubmed-rag/demo.db'
 metric_type: 'COSINE'
 
 # For searching the vector database
-n_results: 10
+n_results: 30
