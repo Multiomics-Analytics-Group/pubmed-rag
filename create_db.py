@@ -53,6 +53,7 @@ if __name__ == "__main__":
     chosen_model = config['transformer_model']
     db_name = config['db name']
     out_dim = config['output_dimensions']
+    metric = config['metric_type']
     logger.info(f'Configuration: {config}')
 
     ## MAIN
@@ -64,6 +65,7 @@ if __name__ == "__main__":
     client.create_collection(
         collection_name="main",
         dimension=out_dim, 
+        metric_type=metric
     )
 
     logger.info(f'Reading in embeddings from folder: {output_path} ...')

@@ -7,7 +7,6 @@ from pubmed_rag.utils import (
     get_basename,
     generate_log_filename,
     init_log,
-    get_config_path,
     config_loader,
     assert_nonempty_keys,
     assert_nonempty_vals,
@@ -43,6 +42,7 @@ def find_similar_vectors(
     chosen_model = config['transformer_model']
     db_name = config['db name']
     n_results = config['n_results']
+    metric = config['metric_type']
     verbose(f'Configuration: {config}')
 
     ## MAIN
@@ -74,6 +74,7 @@ def find_similar_vectors(
         #filter="section == 'abstract'",
         limit=n_results,
         output_fields=["text", "pmid", 'section'],
+        search_params=dict(metric_type=metric)
     )
 
     return result[0]

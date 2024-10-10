@@ -1,16 +1,22 @@
+### Mainly for getting the embeddings
 # list of pmids to put in vector db
 pmid file path: 'demo/demo_pmids.csv' 
 # where to put pubtator and embedding files
 biocjson output path: demo/output 
 # max num of tokens per text - will separate longer sections into multiple subsections
-max_tokens: 300  
+max_tokens: 500
 # model from Hugging Face
 transformer_model: 'microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext' #'sentence-transformers/all-mpnet-base-v2'
-# what to name the db
-db name: 'demo/demo.db' 
-# filepath for tsne plot output - nothing or False if no tsne plot wanted
-tsne: demo/tsne.png 
-# number of nearest vector results to return during search/query
-n_results: 10
 # the pre-trained model's output dimensions e.g., 768 for many LLMs
 output_dimensions: 768
+# filepath for tsne plot output - nothing or False if no tsne plot wanted
+tsne: demo/tsne.png 
+
+### For creating the database
+# what to name the db
+db name: 'demo/demo.db' output_dimensions: 768
+metric_type: 'COSINE'
+
+### For searching the vector database
+# number of nearest vector results to return during search/query
+n_results: 10
