@@ -122,7 +122,11 @@ def passages_to_df(result:dict, out_path:str, prefix:str='df_')->pd.DataFrame:
     df['journal'] = result['journal']
 
     # save to csv
-    df.to_csv(os.path.join(out_path, f'{prefix}{id}.csv'), index=False)
+    df.to_csv(
+        os.path.join(out_path, f'{prefix}{id}.csv'), 
+        index=False,
+        sep='\t'
+    )
 
     return df
 
