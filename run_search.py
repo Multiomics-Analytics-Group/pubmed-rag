@@ -73,7 +73,7 @@ def find_similar_vectors(
         data=sentence_embeddings.detach().numpy(),
         #filter="section == 'abstract'",
         limit=n_results,
-        output_fields=["text", "pmid", 'section'],
+        output_fields=["text", "pmid", 'section', 'sentence'],
         search_params=dict(metric_type=metric)
     )
 
