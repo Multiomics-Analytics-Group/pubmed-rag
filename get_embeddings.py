@@ -33,13 +33,19 @@ if __name__ == "__main__":
     ## GET ARGS
     # init
     parser = argparse.ArgumentParser(
-        prog='get sentence embeddings',
+        prog='embedder',
     )
     parser.add_argument(
         '-c', '--config', 
         action='store',
-        default='demo/config.yaml'
+        default='demo/config.yaml',
+        help='provide path to config yaml file'
         )
+    parser.add_argument(
+        '-fd', '--files_downloaded',
+        action='store_true',
+        help='add this flag if the biocjson files already exist in the "pmid file path" in the config yaml'
+    )
     args = parser.parse_args()
 
     ## START LOG FILE 
