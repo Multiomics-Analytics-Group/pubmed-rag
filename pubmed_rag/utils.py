@@ -1,11 +1,13 @@
 # these functions are pretty general (file that can be reused across projects)
 import argparse
-from datetime import datetime
-import yaml
-import os, sys
-import logging
 import glob
+import logging
+import os
+import sys
 import warnings
+from datetime import datetime
+
+import yaml
 
 
 ## CHECKS
