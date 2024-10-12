@@ -2,11 +2,9 @@
 import argparse
 from datetime import datetime
 import yaml
-import shutil, os, sys, re
+import os, sys
 import logging
 import glob
-import csv
-import subprocess
 import warnings
 
 ## CHECKS
@@ -105,7 +103,6 @@ def warn_folder(
         return warning_message
 
 # FUNCTIONS FOR CONFIG 
-
 def config_loader(filepath:str) -> dict:
     """
     Loads in yaml config file as dict
@@ -136,7 +133,6 @@ def config_loader(filepath:str) -> dict:
 
     return contents
 
-# TODO move new argparser here
 def get_args(prog_name:str, others:dict={}):
     """
     Initiates argparse.ArugmentParser() and adds common arguments.
@@ -180,56 +176,6 @@ def get_args(prog_name:str, others:dict={}):
     )
     args = parser.parse_args()
     return args
-
-
-# obsolete?
-def arg_loader() -> list:
-    """
-    Retreives all arguments after python/shell filename in command line and returns as a list. 
-    If no args than returns an empty list.
-
-    RETURNS
-    -----
-    - input_args (list): A list of command line arguments
-
-    EXAMPLES
-    -----
-    Given files:
-        main.py >
-            from utils import arg_loader
-            arg_loader()
-        run_main.sh >
-            python main.py "$@"
-
-    1) 
-    % python main.py something another
-    ['something', 'another']
-
-    2)
-    % bash run_main.sh
-    []
-
-    3)
-    % bash run_main.sh 'well okay' then
-    ['well okay', 'then']
-    """
-    input_args = sys.argv[1:]
-    return input_args
-def get_config_path() -> str:
-    """
-    Retrieves path to config file from arg_loader and checks that it exists.
-
-    RETURNS
-    -----
-    config_filepath (str): path to config file 
-    """
-    arg_list = arg_loader()
-    assert len(arg_list) > 0, \
-        'Please provide path to config file as an argument e.g. python main.py config/config.yaml' 
-    config_filepath = arg_list[0]
-    assert os.path.exists(os.path.abspath(config_filepath)), \
-        f'filepath to config file does not exist: {os.path.abspath(config_filepath)}'
-    return config_filepath
 
 
 ## FOR LOGGING
