@@ -79,12 +79,12 @@ if __name__ == "__main__":
     logger = get_logger()
     logger.info(f"Arguments: {args}")
 
+    ## MAIN
     result = find_similar_vectors(
         path_to_config=args.config,
         query=args.query,
         logging=True,
     )
-
     logger.info(f"Query: {args.query}")
     logger.info(f"Results:")
     for x in result:
