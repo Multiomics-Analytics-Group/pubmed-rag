@@ -29,6 +29,7 @@ sentence-transformers = "^3.1.1"
 pymilvus = "^2.4.6"
 accelerate = "^1.0.0"
 black = "^24.10.0"
+isort = "^5.13.2"
 
 
 [build-system]
