@@ -209,6 +209,7 @@ if __name__ == "__main__":
     max_tokens = config["max_tokens"]
     chosen_model = config["transformer_model"]
     tsne_fpath = config["tsne"]
+    section_flag = config["condense sections"]
     logger.info(f"Configuration: {config}")
 
     ## MAIN
@@ -225,21 +226,6 @@ if __name__ == "__main__":
 
     # if the biocjson files already been downloaded
     if args.files_downloaded:
-        # check that the folder exists
-        assert_path(args.files_downloaded)
-        logger.info(f"Skipping biocjson retrieval from pubtator.")
-        for i, pmid in enumerate(pmids):
-            logger.info(f"Getting pubtator3 biocjson from api for {i}: {pmid}")
-            result = get_biocjson(id=pmid, out_path=output_path, wait=1)
-            logger.info(f"Saved to {output_path}.")
-            # tokenizing and embedding
-            if result is not None:
-                # store for tsne
-                df_embeddings[pmid] = keep_og_sentences(pmid, result)
-            else:
-                logger.info(f"Result for {pmid} was None.")
-
-    else:
         logger.info(f"Retrieving biocjson files from pubtator.")
         for i, pmid in enumerate(pmids):
             # get biocjson file
@@ -263,10 +249,32 @@ if __name__ == "__main__":
                 result = json.load(f)
             # tokenizing and embedding
             if result is not None:
+                if section_flag:
+                    df = into_sections(pmid, result)
+                else:
+                    df = keep_og_sentences(pmid, result)
                 # store for tsne
-                df_embeddings[pmid] = keep_og_sentences(pmid, result)
+                df_embeddings[pmid] = df
             else:
                 logger.info(f"Biocjson file for {pmid} was None: {biocjson_fpath}")
+    else:
+        # check that the folder exists
+        assert_path(args.files_downloaded)
+        logger.info(f"Skipping biocjson retrieval from pubtator.")
+        for i, pmid in enumerate(pmids):
+            logger.info(f"Getting pubtator3 biocjson from api for {i}: {pmid}")
+            result = get_biocjson(id=pmid, out_path=output_path, wait=1)
+            logger.info(f"Saved to {output_path}.")
+            # tokenizing and embedding
+            if result is not None:
+                if section_flag:
+                    df = into_sections(pmid, result)
+                else:
+                    df = keep_og_sentences(pmid, result)
+                # store for tsne
+                df_embeddings[pmid] = df
+            else:
+                logger.info(f"Result for {pmid} was None.")
 
     # SAVE ALL EMBEDDINGS IN ONE FILE
     # put all in one df
