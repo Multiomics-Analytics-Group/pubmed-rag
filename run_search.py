@@ -9,10 +9,8 @@ from pubmed_rag.utils import (
     assert_nonempty_keys,
     assert_nonempty_vals,
     config_loader,
-    generate_log_filename,
     get_args,
-    get_basename,
-    init_log,
+    get_logger,
 )
 
 
@@ -78,14 +76,7 @@ if __name__ == "__main__":
     )
 
     ## START LOG FILE
-    # get log suffix, which will be the current script's base file name
-    log_suffix = get_basename()
-    # generate log file name
-    log_file = generate_log_filename(suffix=log_suffix)
-    # init logger
-    logger = init_log(log_file, display=True)
-    # log it
-    logger.info(f"Path to log file: {log_file}")
+    logger = get_logger()
     logger.info(f"Arguments: {args}")
 
     result = find_similar_vectors(

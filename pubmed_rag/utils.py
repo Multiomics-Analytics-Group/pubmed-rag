@@ -358,6 +358,22 @@ def init_log(filename: str, display: bool = False, logger_id: str | None = None)
     return logger
 
 
+def get_logger():
+    """
+    Putting at all together to init the log file.
+    """
+    # get log suffix, which will be the current script's base file name
+    log_suffix = get_basename()
+    # generate log file name
+    log_file = generate_log_filename(suffix=log_suffix)
+    # init logger
+    logger = init_log(log_file, display=True)
+    # log it
+    logger.info(f"Path to log file: {log_file}")
+
+    return logger
+
+
 ## OTHERS
 def get_chunks(lst, n):
     """
