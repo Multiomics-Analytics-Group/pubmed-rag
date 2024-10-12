@@ -3,10 +3,12 @@
 pmid file path: 'demo/demo_pmids.csv' 
 # where to put pubtator and embedding files
 biocjson output path: demo/output 
+# whether to collapse text by sections - will separate longer sections into multiple subsections
+condense sections: False
 # max num of tokens per text - will separate longer sections into multiple subsections
 max_tokens: 500
 # model from Hugging Face
-transformer_model: 'microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext' #'sentence-transformers/all-mpnet-base-v2'
+transformer_model: 'sentence-transformers/all-mpnet-base-v2'
 # the pre-trained model's output dimensions e.g., 768 for many LLMs
 output_dimensions: 768
 # filepath for tsne plot output - nothing or False if no tsne plot wanted
