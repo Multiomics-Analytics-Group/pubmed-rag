@@ -46,7 +46,6 @@ if __name__ == "__main__":
     assert_nonempty_vals(config)
     pmid_path = config["pmid file path"]
     output_path = config["biocjson output path"]
-    max_tokens = config["max_tokens"]
     chosen_model = config["transformer_model"]
     db_name = config["db name"]
     col_name = config["collection name"]
@@ -77,7 +76,7 @@ if __name__ == "__main__":
     logger.info(f"Number of embeddings is: {len(data)}")
 
     # put data into db
-    result = client.insert(collection_name="main", data=data)
+    result = client.insert(collection_name=col_name, data=data)
     logger.info(f"Inserted data into db: {result}")
 
     logger.info("Complete.")
