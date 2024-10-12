@@ -23,10 +23,11 @@ Using get_embeddings.py
 `python get_embeddings.py --config <path to config file>`
 
 Args:
-- `--config` or `--c <path to config file>` 
+- `--config` or `-c <path to config file>` 
+- `--files_downloaded` or `-fd <path to folder with biocjson files>`
 
 Examples:
-- `python get_embeddings.py -c demo/config.yaml`
+- `python get_embeddings.py -c demo/config.yaml -fd biocjson`
 - `python get_embeddings.py --config config.yaml`
 
 #### 2.b) Putting the embeddings into a vector database
@@ -35,7 +36,7 @@ Using create_db.py
 `python create_db.py --config <path to config file>`
 
 Args:
-- `--config` or `--c <path to config file>` 
+- `--config` or `-c <path to config file>` 
 
 Examples:
 - `python create_db.py -c demo/config.yaml`
@@ -49,7 +50,7 @@ Using run_search.py
 `python run_search.py --config <path to config file> --query <the LLM prompt>`
 
 Args:
-- `--config` or `--c <path to config file>` 
+- `--config` or `-c <path to config file>` 
 - `--query` or `--q <text to embed>` 
 
 Examples:
