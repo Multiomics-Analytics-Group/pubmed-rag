@@ -33,9 +33,9 @@ def find_similar_vectors(path_to_config: str, query: str, logging: bool = False)
     config = config_loader(config_filepath)
     assert_nonempty_keys(config)
     assert_nonempty_vals(config)
-    output_path = config["biocjson output path"]
     chosen_model = config["transformer_model"]
     db_name = config["db name"]
+    col_name = config["collection name"]
     n_results = config["n_results"]
     metric = config["metric_type"]
     verbose(f"Configuration: {config}")
@@ -58,7 +58,7 @@ def find_similar_vectors(path_to_config: str, query: str, logging: bool = False)
     ## RUN QUERY
     verbose("Searching against vector database")
     result = client.search(
-        collection_name="main",
+        collection_name=col_name,
         data=sentence_embeddings.detach().numpy(),
         # filter="section == 'abstract'",
         limit=n_results,
