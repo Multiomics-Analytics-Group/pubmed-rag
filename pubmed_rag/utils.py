@@ -175,8 +175,8 @@ def get_args(prog_name: str, others: dict = {}):
     parser.add_argument(
         "-fd",
         "--files_downloaded",
-        action="store_true",
-        help='add this flag if the biocjson files already exist in the "pmid file path" in the config yaml',
+        action="store",
+        help="add path to the biocjson files if already downloaded",
     )
     args = parser.parse_args()
     return args
