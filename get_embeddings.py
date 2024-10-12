@@ -57,7 +57,6 @@ def into_sections(pmid, result):
     df_filtered = df_filtered[
         df_filtered["sentence"].apply(lambda x: len(x.split()) > 5)
     ]
-    df_filtered = df_filtered.drop("index", axis=1)
 
     # grouping by section
     logger.info(f"Grouping by section...")
@@ -68,8 +67,7 @@ def into_sections(pmid, result):
         smaller = get_smaller_texts(section, max_tokens)
         collapsed.at[i, "text"] = smaller
     exploded = collapsed.explode("text")
-    # fix this later, want ot save over section
-    df_filtered.to_csv(
+    exploded.to_csv(
         os.path.join(output_path, f"sectioned_{pmid}.csv"), index=False, sep="\t"
     )
 
