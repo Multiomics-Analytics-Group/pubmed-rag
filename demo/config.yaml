@@ -14,7 +14,8 @@ tsne: demo/tsne.png
 
 ### For creating the database
 # what to name the db
-db name: 'demo/demo.db' 
+db name: 'demo/demo.db'
+collection name: 'main'
 metric_type: 'COSINE'
 
 ### For searching the vector database

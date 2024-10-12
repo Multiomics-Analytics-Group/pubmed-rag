@@ -10,6 +10,7 @@ tsne: 'tsne-smaller.png' #or empty string or False if no tsne wanted
 
 # For creating the database
 db name: '/users/anglup/github/pubmed-rag/demo.db'
+collection name: 'main'
 metric_type: 'COSINE'
 
 # For searching the vector database
