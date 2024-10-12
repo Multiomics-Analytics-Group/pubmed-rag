@@ -1,5 +1,4 @@
 # import 
-import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -14,6 +13,7 @@ from pubmed_rag.utils import (
     config_loader,
     assert_nonempty_keys,
     assert_nonempty_vals,
+    get_args
 )
 
 from pubmed_rag.bioc import (
@@ -32,21 +32,10 @@ if __name__ == "__main__":
 
     ## GET ARGS
     # init
-    parser = argparse.ArgumentParser(
-        prog='embedder',
+    args = get_args(
+        prog_name='embedder',
+        others=dict(description='generates embeddings')
     )
-    parser.add_argument(
-        '-c', '--config', 
-        action='store',
-        default='demo/config.yaml',
-        help='provide path to config yaml file'
-        )
-    parser.add_argument(
-        '-fd', '--files_downloaded',
-        action='store_true',
-        help='add this flag if the biocjson files already exist in the "pmid file path" in the config yaml'
-    )
-    args = parser.parse_args()
 
     ## START LOG FILE 
     # get log suffix, which will be the current script's base file name

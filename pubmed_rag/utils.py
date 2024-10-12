@@ -1,4 +1,5 @@
 # these functions are pretty general (file that can be reused across projects)
+import argparse
 from datetime import datetime
 import yaml
 import shutil, os, sys, re
@@ -136,6 +137,50 @@ def config_loader(filepath:str) -> dict:
     return contents
 
 # TODO move new argparser here
+def get_args(prog_name:str, others:dict={}):
+    """
+    Initiates argparse.ArugmentParser() and adds common arguments.
+
+    :param prog_name: The name of the program. 
+    :type prog_name: str
+
+    :returns: 
+    :rtype: 
+    """
+
+    ### PRECONDITIONS
+    assert isinstance(prog_name, str), \
+        f"prog_name should be a string: {prog_name}"
+    assert isinstance(others, dict), \
+        f"other kwargs must be a dict: {others}"
+    ## MAIN FUNCTION
+    # init
+    parser = argparse.ArgumentParser(
+        prog=prog_name,
+        **others
+    )
+    # config file path
+    parser.add_argument(
+        '-c', '--config',
+        action='store',
+        default='demo/config.yaml',
+        help='provide path to config yaml file'
+    )
+    # used in run_search.py
+    parser.add_argument(
+        '-q', '--query',
+        action='store',
+        help='text to embed and search in vector db'
+    )
+    # used in get_embeddings.py
+    parser.add_argument(
+        '-fd', '--files_downloaded',
+        action='store_true',
+        help='add this flag if the biocjson files already exist in the "pmid file path" in the config yaml'
+    )
+    args = parser.parse_args()
+    return args
+
 
 # obsolete?
 def arg_loader() -> list:
@@ -188,7 +233,6 @@ def get_config_path() -> str:
 
 
 ## FOR LOGGING
-
 def get_basename(fname:None|str=None)->str:
     """
     - For a given filename, returns basename WITHOUT file extension

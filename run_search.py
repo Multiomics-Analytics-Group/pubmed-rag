@@ -1,5 +1,4 @@
 # import 
-import argparse
 import json
 from transformers import AutoTokenizer, AutoModel
 from pymilvus import MilvusClient
@@ -10,6 +9,7 @@ from pubmed_rag.utils import (
     config_loader,
     assert_nonempty_keys,
     assert_nonempty_vals,
+    get_args
 )
 
 from pubmed_rag.model import (
@@ -83,20 +83,10 @@ if __name__ == "__main__":
 
     ## GET ARGS
     # init
-    parser = argparse.ArgumentParser(
-        prog='run_search',
-        description='gets config path and query'
+    args = get_args(
+        prog_name='run_search',
+        others=dict(description='queries the vector db')
     )
-    parser.add_argument(
-        '-c', '--config', 
-        action='store',
-        default='demo/config.yaml'
-        )
-    parser.add_argument(
-        '-q', '--query',
-        action='store',
-    )
-    args = parser.parse_args()
 
     ## START LOG FILE 
     # get log suffix, which will be the current script's base file name

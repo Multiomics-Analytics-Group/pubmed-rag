@@ -11,21 +11,17 @@ from pubmed_rag.utils import (
     config_loader,
     assert_nonempty_keys,
     assert_nonempty_vals,
+    get_args
 )
 
 if __name__ == "__main__":
 
     ## GET ARGS
     # init
-    parser = argparse.ArgumentParser(
-        prog='get sentence embeddings',
+    args = get_args(
+        prog_name='create_vector_db',
+        others=dict(description='puts embeddings into vector database')
     )
-    parser.add_argument(
-        '-c', '--config', 
-        action='store',
-        default='demo/config.yaml'
-        )
-    args = parser.parse_args()
 
     ## START LOG FILE 
     # get log suffix, which will be the current script's base file name
