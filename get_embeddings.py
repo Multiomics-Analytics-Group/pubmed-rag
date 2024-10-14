@@ -124,6 +124,8 @@ def keep_og_sentences(pmid, result):
     df_filtered["embedding"] = pd.Series(
         sentence_embeddings.detach().numpy().tolist()
     ).values
+    # rename sentences to text
+    df_filtered = df_filtered.rename(columns=dict(sentence='text'))
     # save to csv
     logger.info(f"Saving embeddings to {output_path}")
     df_filtered.to_csv(
