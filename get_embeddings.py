@@ -216,7 +216,9 @@ if __name__ == "__main__":
 
     # if the biocjson files already been downloaded
     if args.files_downloaded:
-        logger.info(f"Retrieving biocjson files from pubtator.")
+        # check that the folder exists
+        assert_path(args.files_downloaded)
+        logger.info(f"Skipping biocjson file retreival from pubtator.")
         for i, pmid in enumerate(pmids):
             # get biocjson file
             matching_file = filter_filepaths(
@@ -248,9 +250,7 @@ if __name__ == "__main__":
             else:
                 logger.info(f"Biocjson file for {pmid} was None: {biocjson_fpath}")
     else:
-        # check that the folder exists
-        assert_path(args.files_downloaded)
-        logger.info(f"Skipping biocjson retrieval from pubtator.")
+        logger.info(f"Retrieving biocjson from pubtator.")
         for i, pmid in enumerate(pmids):
             logger.info(f"Getting pubtator3 biocjson from api for {i}: {pmid}")
             result = get_biocjson(id=pmid, out_path=output_path, wait=1)
