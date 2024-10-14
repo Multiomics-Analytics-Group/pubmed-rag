@@ -16,4 +16,8 @@ collection name: 't200_NeuML'
 metric_type: 'COSINE'
 
 # For searching the vector database
-n_results: 30
+n_results: 20
+
+### to LLM
+llama model: llama3.1
+llama api: "http://localhost:11434/api/chat"

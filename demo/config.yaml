@@ -23,3 +23,7 @@ metric_type: 'COSINE'
 ### For searching the vector database
 # number of nearest vector results to return during search/query
 n_results: 10
+
+### to LLM
+llama model: llama3.1
+llama api: "http://localhost:11434/api/chat"
