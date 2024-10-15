@@ -1,7 +1,7 @@
 # import
 import json
-import requests
 
+import requests
 from pymilvus import MilvusClient
 from transformers import AutoModel, AutoTokenizer
 
@@ -13,12 +13,18 @@ from pubmed_rag.utils import (
     get_args,
     get_logger,
 )
-
 from run_search import find_similar_vectors
 
-def init_prompt(query:str, results:list)->list:
 
-    restrictions = '''You can only use academic papers from pubmed or biorxiv or google scholar to support your answer. '''
+def init_prompt(query: str, results: list) -> list:
+    """
+        Thank you to the following resources:
+        - PanKB (B Sun, L Pashkova, PA Pieters, AS Harke, OS Mohite, BO Palsson, PV Phaneuf
+    bioRxiv 2024.08.16.608241; doi: https://doi.org/10.1101/2024.08.16.608241)
+        - https://www.llama.com/docs/how-to-guides/prompting
+    """
+
+    restrictions = """You can only use academic papers from pubmed or biorxiv or google scholar to support your answer. """
     role = """
     You are a biological/biomedical Knowledge graph (KG) LLM. You are a cautious assistant proficient in creating knowledge graphs for biological and biomedical use cases. 
     You are able to find answers to the questions from the contextual passage snippets provided and their affiliated pubmed articles.
@@ -35,9 +41,9 @@ def init_prompt(query:str, results:list)->list:
     question = f"<question>{query}</question>"
 
     the_context = ""
-    metadata = [x['entity'] for x in results]
+    metadata = [x["entity"] for x in results]
 
-    for data in metadata: 
+    for data in metadata:
 
         the_context += f"""<context>{data['text']}</context> <pmid>{str(data['pmid'])}</pmid>
         """
@@ -45,35 +51,49 @@ def init_prompt(query:str, results:list)->list:
     system_content = f"{role} Restrictions: {restrictions}"
     user_content = the_task + question + the_context
 
-    system_prompt = {
-        'role':'system',
-        'content':system_content
-    }
+    system_prompt = {"role": "system", "content": system_content}
 
-    user_prompt = {
-        'role':'user',
-        'content':user_content
-    }
+    user_prompt = {"role": "user", "content": user_content}
 
     prompt = [system_prompt, user_prompt]
 
     ## POST CONDITIONS
-    
+    assert isinstance(prompt, list), f"Was unable to save prompt as a list of dicts"
+    for x in prompt:
+        assert isinstance(x, dict), f"could not save x as a dict: {x}"
+
     return prompt
 
-def llama3(prompt:list, model='llama3.1'):
+
+def llama3(prompt: list, model="llama3.1") -> str:
+    """
+    getting response from llama3 LLM
+    https://www.llama.com/docs/llama-everywhere/running-meta-llama-on-mac/
+
+    :param prompt: A list of dictionaries with the prompts to the model
+    :type prompt: list
+    :param model: The name of the llama LLM version
+    :type model: str
+
+    :param return: The LLMs response?
+    :rtype: str
+    """
     data = {
         "model": model,
         "messages": prompt,
         "stream": False,
     }
 
-    headers = {
-        "Content-Type": "application/json"
-    }
+    headers = {"Content-Type": "application/json"}
 
     response = requests.post(llama_api, headers=headers, json=data)
-    return response.json()["message"]["content"]
+
+    if response.status_code == 200:
+        return response.json()["message"]["content"]
+    else:
+        raise ConnectionError(
+            f"There was an issue with the model and/or api. Please check ollama."
+        )
 
 
 if __name__ == "__main__":
@@ -98,23 +118,24 @@ if __name__ == "__main__":
     config = config_loader(config_filepath)
     assert_nonempty_keys(config)
     assert_nonempty_vals(config)
-    llama_model = config['llama model']
-    llama_api = config['llama api']
+    llama_model = config["llama model"]
+    llama_api = config["llama api"]
     logger.info(f"Configuration: {config}")
 
     # ## MAIN
     # getting context from vector database
+    logger.info(f"Embedding question and searching vector database...")
     result = find_similar_vectors(
         path_to_config=args.config,
         query=args.query,
         logging=False,
     )
-    # logger.info(f"Query: {args.query}")
-    # logger.info(f"Results:")
+
     # preparing the prompt
     prompt = init_prompt(args.query, result)
     logger.info(f"The prompt going to the LLM: {prompt}")
 
+    # prompt to the LLM
     response = llama3(
         prompt=prompt,
         model=llama_model,
