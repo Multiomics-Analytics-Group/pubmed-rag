@@ -57,3 +57,16 @@ Args:
 Examples:
 - `python run_search.py -c demo/config.yaml -q "Can you please tell me what nodes and edges I should include in a biological knowledge graph for drug repurposing?"`
 - `python run_search.py --config demo/config.yaml --query "Best databases to use for a knowledge graph for biological question answering?"`
+
+#### RAG model
+
+Using use_rag.py
+`python use_rag.py --config <path to config file> --query <the LLM prompt>`
+
+Args:
+- `--config` or `-c <path to config file>` 
+- `--query` or `--q <text to embed>` 
+
+Examples:
+- `python use_rag.py -c demo/config.yaml -q "Can you please tell me what nodes and edges I should include in a biological knowledge graph for drug repurposing?"`
+- `python use_rag.py --config demo/config.yaml --query "Best databases to use for a knowledge graph for biological question answering?"`
