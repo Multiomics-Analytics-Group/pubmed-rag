@@ -2,7 +2,7 @@
 
 import requests
 
-from pubmed_rag.utils import (
+from pubmed_rag.helpers.utils import (
     assert_nonempty_keys,
     assert_nonempty_vals,
     config_loader,
