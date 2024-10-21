@@ -9,14 +9,14 @@ from sklearn.manifold import TSNE
 from sklearn.preprocessing import LabelEncoder
 from transformers import AutoModel, AutoTokenizer
 
-from pubmed_rag.bioc import (
+from pubmed_rag.helpers.bioc import (
     collapse_sections,
     get_biocjson,
     get_smaller_texts,
     passages_to_df,
 )
-from pubmed_rag.model import get_sentence_embeddings, get_tokens
-from pubmed_rag.utils import (
+from pubmed_rag.helpers.model import get_sentence_embeddings, get_tokens
+from pubmed_rag.helpers.utils import (
     assert_nonempty_keys,
     assert_nonempty_vals,
     assert_path,

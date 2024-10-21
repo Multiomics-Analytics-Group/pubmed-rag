@@ -4,8 +4,8 @@ import json
 from pymilvus import MilvusClient
 from transformers import AutoModel, AutoTokenizer
 
-from pubmed_rag.model import get_sentence_embeddings, get_tokens
-from pubmed_rag.utils import (
+from pubmed_rag.helpers.model import get_sentence_embeddings, get_tokens
+from pubmed_rag.helpers.utils import (
     assert_nonempty_keys,
     assert_nonempty_vals,
     config_loader,

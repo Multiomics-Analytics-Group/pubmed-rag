@@ -7,7 +7,7 @@ import nltk
 import pandas as pd
 import requests
 
-from pubmed_rag.utils import assert_path, get_chunks
+from pubmed_rag.helpers.utils import assert_path, get_chunks
 
 nltk.download("punkt_tab")
 from nltk.tokenize import sent_tokenize, word_tokenize
