@@ -9,7 +9,7 @@ from pubmed_rag.helpers.utils import (
     get_args,
     get_logger,
 )
-from run_search import find_similar_vectors
+from pubmed_rag.run_search import find_similar_vectors
 
 
 def init_prompt(query: str, results: list) -> list:
