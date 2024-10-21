@@ -5,16 +5,15 @@ from ast import literal_eval
 import pandas as pd
 from pymilvus import MilvusClient
 
-from pubmed_rag.utils import (
+from pubmed_rag.helpers.utils import (
     assert_nonempty_keys,
     assert_nonempty_vals,
     config_loader,
     get_args,
-    get_logger
+    get_logger,
 )
 
 if __name__ == "__main__":
-
     ## GET ARGS
     # init
     args = get_args(

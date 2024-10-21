@@ -4,8 +4,8 @@ import json
 from pymilvus import MilvusClient
 from transformers import AutoModel, AutoTokenizer
 
-from pubmed_rag.model import get_sentence_embeddings, get_tokens
-from pubmed_rag.utils import (
+from pubmed_rag.helpers.model import get_sentence_embeddings, get_tokens
+from pubmed_rag.helpers.utils import (
     assert_nonempty_keys,
     assert_nonempty_vals,
     config_loader,
@@ -68,7 +68,6 @@ def find_similar_vectors(path_to_config: str, query: str, logging: bool = False)
 
 
 if __name__ == "__main__":
-
     ## GET ARGS
     # init
     args = get_args(
@@ -86,7 +85,7 @@ if __name__ == "__main__":
         logging=True,
     )
     logger.info(f"Query: {args.query}")
-    logger.info(f"Results:")
+    logger.info("Results:")
     for x in result:
         logger.info(json.dumps(x, indent=4))
 
