@@ -26,155 +26,167 @@ from pubmed_rag.utils import (
     get_logger
 )
 
-
-def into_sections(pmid, result):
-
-    logger.info(f"Now, passages to df and saved to: {output_path}")
-    df_test = passages_to_df(result, output_path)
-
-    # cleaning?
-    logger.info(f"Light cleaning")
-    # lower case section names
-    df_test["section"] = df_test["section"].str.lower().str.strip()
-    # pmids to object
-    df_test["pmid"] = df_test["pmid"].astype(str)
-    df_test["date"] = pd.to_datetime(df_test["date"])
-    # also stripping sentences in case?
-    df_test["sentence"] = df_test["sentence"].str.strip()
-    punctuations = ("!", ",", ".", "?", ",", '"', "'")
-    # lol adding a . to the end for now? if no punc
-    df_test["sentence"] = np.where(
-        df_test["sentence"].str.endswith(punctuations),
-        df_test["sentence"],
-        df_test["sentence"] + ".",
-    )
-    # which sections to keep?
-    keep_sections = ["abstract", "intro", "results", "discuss", "methods", "concl"]
-    # filter
-    df_filtered = df_test[df_test["section"].isin(keep_sections)].copy()
-    df_filtered = df_filtered[
-        df_filtered["sentence"].apply(lambda x: len(x.split()) > 5)
-    ]
-
-    # grouping by section
-    logger.info(f"Grouping by section...")
-    collapsed = collapse_sections(df_filtered, "biocjson")
-    # smaller texts within section
-    logger.info(f"Smaller texts with max {max_tokens} tokens within section...")
-    for i, section in enumerate(collapsed["text"]):
-        smaller = get_smaller_texts(section, max_tokens)
-        collapsed.at[i, "text"] = smaller
-    exploded = collapsed.explode("text")
-    exploded.to_csv(
-        os.path.join(output_path, f"sectioned_{pmid}.csv"), index=False, sep="\t"
-    )
-
-    # GET EMBEDDINGS
-    logger.info(f"Getting embeddings for {pmid}")
-    # Tokenize sentences
-    encoded_input = get_tokens(tokenizer, exploded["text"].to_list())
-    # get embeddings
-    sentence_embeddings = get_sentence_embeddings(model, encoded_input)
-
-    # append back to df
-    exploded["embedding"] = pd.Series(
-        sentence_embeddings.detach().numpy().tolist()
-    ).values
-
-    # save to csv
-    logger.info(f"Saving embeddings to {output_path}")
-    exploded.to_csv(
-        os.path.join(output_path, f"embed_{pmid}.csv"), index=False, sep="\t"
-    )
-
-    return exploded
-
-
-def keep_og_sentences(pmid, result):
-    logger.info(f"Now, passages to df and saved to: {output_path}")
-    df_test = passages_to_df(result, output_path)
-
-    # cleaning?
-    logger.info(f"Light cleaning")
-    # lower case section names
-    df_test["section"] = df_test["section"].str.lower().str.strip()
-    # pmids to object
-    df_test["pmid"] = df_test["pmid"].astype(str)
-    df_test["date"] = pd.to_datetime(df_test["date"])
-    # also stripping sentences in case?
-    df_test["sentence"] = df_test["sentence"].str.strip()
-    punctuations = ("!", ",", ".", "?", ",", '"', "'")
-
-    # which sections to keep?
-    keep_sections = ["abstract", "intro", "results", "discuss", "methods", "concl"]
-    # filter
-    df_filtered = df_test[df_test["section"].isin(keep_sections)].copy()
-    df_filtered = df_filtered[
-        df_filtered["sentence"].apply(lambda x: len(x.split()) > 5)
-    ]
-    df_filtered = df_filtered.drop("index", axis=1)
-
-    # GET EMBEDDINGS
-    logger.info(f"Getting embeddings for {pmid}")
-    # Tokenize sentences
-    encoded_input = get_tokens(tokenizer, df_filtered["sentence"].to_list())
-    # get embeddings
-    sentence_embeddings = get_sentence_embeddings(model, encoded_input)
-    # append back to df
-    df_filtered["embedding"] = pd.Series(
-        sentence_embeddings.detach().numpy().tolist()
-    ).values
-    # rename sentences to text
-    df_filtered = df_filtered.rename(columns=dict(sentence='text'))
-    # save to csv
-    logger.info(f"Saving embeddings to {output_path}")
-    df_filtered.to_csv(
-        os.path.join(output_path, f"embed_{pmid}.csv"), index=False, sep="\t"
-    )
-
-    return df_filtered
-
-
-def gen_tsne():
-    # perplexity must be less than n_samples
-    if num_emb > 50:
-        perp = 50
-    elif num_emb > 25:
-        perp = 25
-    else:
-        perp = num_emb - 0.5
-
-    # Perform t-SNE
-    tsne = TSNE(n_components=2, random_state=42, perplexity=perp)
-    entity_embeddings_2d = tsne.fit_transform(np.vstack(all_dfs["embedding"]))
-
-    # Get labels
-    label_encoder = LabelEncoder()
-    sections_enc = label_encoder.fit_transform(all_dfs["section"])
-
-    # Plot the embeddings
-    plt.figure()
-    scatter = plt.scatter(
-        entity_embeddings_2d[:, 0],
-        entity_embeddings_2d[:, 1],
-        alpha=0.5,
-        c=sections_enc,
-    )
-    # Mapping encoded labels back to original labels in the legend
-    handles, _ = scatter.legend_elements()
-    original_labels = label_encoder.inverse_transform(range(len(handles)))
-
-    # Add a legend with the original (non-encoded) labels
-    plt.legend(handles, original_labels, title="sections")
-
-    plt.title("t-SNE Visualization of Embeddings by section")
-    plt.xlabel("Component 1")
-    plt.ylabel("Component 2")
-    plt.savefig(tsne_fpath)
-    logger.info(f"Tsne plot saved to {tsne_fpath}")
-
-
 if __name__ == "__main__":
+
+    ## HELPERS? keep inside main for now
+
+    def into_sections(pmid, result):
+        # TODO take more arguments e.g. keep_sections, filenaming prefix, output_path
+        # TODO docstrings 
+        # TODO checks
+
+        logger.info(f"Now, passages to df and saved to: {output_path}")
+        df_test = passages_to_df(result, output_path)
+
+        # cleaning?
+        logger.info(f"Light cleaning")
+        # lower case section names
+        df_test["section"] = df_test["section"].str.lower().str.strip()
+        # pmids to object
+        df_test["pmid"] = df_test["pmid"].astype(str)
+        df_test["date"] = pd.to_datetime(df_test["date"])
+        # also stripping sentences in case?
+        df_test["sentence"] = df_test["sentence"].str.strip()
+        punctuations = ("!", ",", ".", "?", ",", '"', "'")
+        # lol adding a . to the end for now? if no punc
+        df_test["sentence"] = np.where(
+            df_test["sentence"].str.endswith(punctuations),
+            df_test["sentence"],
+            df_test["sentence"] + ".",
+        )
+        # which sections to keep?
+        keep_sections = ["abstract", "intro", "results", "discuss", "methods", "concl"]
+        # filter
+        df_filtered = df_test[df_test["section"].isin(keep_sections)].copy()
+        df_filtered = df_filtered[
+            df_filtered["sentence"].apply(lambda x: len(x.split()) > 5)
+        ]
+
+        # grouping by section
+        logger.info(f"Grouping by section...")
+        collapsed = collapse_sections(df_filtered, "biocjson")
+        # smaller texts within section
+        logger.info(f"Smaller texts with max {max_tokens} tokens within section...")
+        for i, section in enumerate(collapsed["text"]):
+            smaller = get_smaller_texts(section, max_tokens)
+            collapsed.at[i, "text"] = smaller
+        exploded = collapsed.explode("text")
+        exploded.to_csv(
+            os.path.join(output_path, f"sectioned_{pmid}.csv"), index=False, sep="\t"
+        )
+
+        # GET EMBEDDINGS
+        logger.info(f"Getting embeddings for {pmid}")
+        # Tokenize sentences
+        encoded_input = get_tokens(tokenizer, exploded["text"].to_list())
+        # get embeddings
+        sentence_embeddings = get_sentence_embeddings(model, encoded_input)
+
+        # append back to df
+        exploded["embedding"] = pd.Series(
+            sentence_embeddings.detach().numpy().tolist()
+        ).values
+
+        # save to csv
+        logger.info(f"Saving embeddings to {output_path}")
+        exploded.to_csv(
+            os.path.join(output_path, f"embed_{pmid}.csv"), index=False, sep="\t"
+        )
+
+        return exploded
+
+
+    def keep_og_sentences(pmid, result):
+        # TODO take more arguments e.g. keep_sections, filenaming prefix, output_path
+        # TODO docstrings 
+        # TODO checks
+
+        logger.info(f"Now, passages to df and saved to: {output_path}")
+        df_test = passages_to_df(result, output_path)
+
+        # cleaning?
+        logger.info(f"Light cleaning")
+        # lower case section names
+        df_test["section"] = df_test["section"].str.lower().str.strip()
+        # pmids to object
+        df_test["pmid"] = df_test["pmid"].astype(str)
+        df_test["date"] = pd.to_datetime(df_test["date"])
+        # also stripping sentences in case?
+        df_test["sentence"] = df_test["sentence"].str.strip()
+        punctuations = ("!", ",", ".", "?", ",", '"', "'")
+
+        # which sections to keep?
+        keep_sections = ["abstract", "intro", "results", "discuss", "methods", "concl"]
+        # filter
+        df_filtered = df_test[df_test["section"].isin(keep_sections)].copy()
+        df_filtered = df_filtered[
+            df_filtered["sentence"].apply(lambda x: len(x.split()) > 5)
+        ]
+        df_filtered = df_filtered.drop("index", axis=1)
+
+        # GET EMBEDDINGS
+        logger.info(f"Getting embeddings for {pmid}")
+        # Tokenize sentences
+        encoded_input = get_tokens(tokenizer, df_filtered["sentence"].to_list())
+        # get embeddings
+        sentence_embeddings = get_sentence_embeddings(model, encoded_input)
+        # append back to df
+        df_filtered["embedding"] = pd.Series(
+            sentence_embeddings.detach().numpy().tolist()
+        ).values
+        # rename sentences to text
+        df_filtered = df_filtered.rename(columns=dict(sentence='text'))
+        # save to csv
+        logger.info(f"Saving embeddings to {output_path}")
+        df_filtered.to_csv(
+            os.path.join(output_path, f"embed_{pmid}.csv"), index=False, sep="\t"
+        )
+
+        return df_filtered
+
+
+    def gen_tsne():
+        # TODO make reusable
+        # TODO docstrings 
+        # TODO checks
+
+        # perplexity must be less than n_samples
+        if num_emb > 50:
+            perp = 50
+        elif num_emb > 25:
+            perp = 25
+        else:
+            perp = num_emb - 0.5
+
+        # Perform t-SNE
+        tsne = TSNE(n_components=2, random_state=42, perplexity=perp)
+        entity_embeddings_2d = tsne.fit_transform(np.vstack(all_dfs["embedding"]))
+
+        # Get labels
+        label_encoder = LabelEncoder()
+        sections_enc = label_encoder.fit_transform(all_dfs["section"])
+
+        # Plot the embeddings
+        plt.figure()
+        scatter = plt.scatter(
+            entity_embeddings_2d[:, 0],
+            entity_embeddings_2d[:, 1],
+            alpha=0.5,
+            c=sections_enc,
+        )
+        # Mapping encoded labels back to original labels in the legend
+        handles, _ = scatter.legend_elements()
+        original_labels = label_encoder.inverse_transform(range(len(handles)))
+
+        # Add a legend with the original (non-encoded) labels
+        plt.legend(handles, original_labels, title="sections")
+
+        plt.title("t-SNE Visualization of Embeddings by section")
+        plt.xlabel("Component 1")
+        plt.ylabel("Component 2")
+        plt.savefig(tsne_fpath)
+        logger.info(f"Tsne plot saved to {tsne_fpath}")
+
 
     ## GET ARGS
     # init
