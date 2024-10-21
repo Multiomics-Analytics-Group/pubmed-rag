@@ -1,11 +1,7 @@
 # import
-import json
 
 import requests
-from pymilvus import MilvusClient
-from transformers import AutoModel, AutoTokenizer
 
-from pubmed_rag.model import get_sentence_embeddings, get_tokens
 from pubmed_rag.utils import (
     assert_nonempty_keys,
     assert_nonempty_vals,
@@ -44,7 +40,6 @@ def init_prompt(query: str, results: list) -> list:
     metadata = [x["entity"] for x in results]
 
     for data in metadata:
-
         the_context += f"""<context>{data['text']}</context> <pmid>{str(data['pmid'])}</pmid>
         """
 
@@ -58,7 +53,7 @@ def init_prompt(query: str, results: list) -> list:
     prompt = [system_prompt, user_prompt]
 
     ## POST CONDITIONS
-    assert isinstance(prompt, list), f"Was unable to save prompt as a list of dicts"
+    assert isinstance(prompt, list), "Was unable to save prompt as a list of dicts"
     for x in prompt:
         assert isinstance(x, dict), f"could not save x as a dict: {x}"
 
@@ -92,12 +87,11 @@ def llama3(prompt: list, model="llama3.1") -> str:
         return response.json()["message"]["content"]
     else:
         raise ConnectionError(
-            f"There was an issue with the model and/or api. Please check ollama."
+            "There was an issue with the model and/or api. Please check ollama."
         )
 
 
 if __name__ == "__main__":
-
     ## GET ARGS
     # init
     args = get_args(
@@ -124,7 +118,7 @@ if __name__ == "__main__":
 
     # ## MAIN
     # getting context from vector database
-    logger.info(f"Embedding question and searching vector database...")
+    logger.info("Embedding question and searching vector database...")
     result = find_similar_vectors(
         path_to_config=args.config,
         query=args.query,

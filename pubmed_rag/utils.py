@@ -75,7 +75,7 @@ def assert_nonempty_vals(dictionary: dict):
 
 def warn_folder(
     folderpath: str,
-    warning_message: str = f"Warning: There are existing files in the given folderpath.",
+    warning_message: str = "Warning: There are existing files in the given folderpath.",
 ):
     """
     Checks if the folder is empty. If not empty raise a warning.

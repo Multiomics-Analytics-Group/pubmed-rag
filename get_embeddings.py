@@ -23,23 +23,22 @@ from pubmed_rag.utils import (
     config_loader,
     filter_filepaths,
     get_args,
-    get_logger
+    get_logger,
 )
 
 if __name__ == "__main__":
-
     ## HELPERS? keep inside main for now
 
     def into_sections(pmid, result):
         # TODO take more arguments e.g. keep_sections, filenaming prefix, output_path
-        # TODO docstrings 
+        # TODO docstrings
         # TODO checks
 
         logger.info(f"Now, passages to df and saved to: {output_path}")
         df_test = passages_to_df(result, output_path)
 
         # cleaning?
-        logger.info(f"Light cleaning")
+        logger.info("Light cleaning")
         # lower case section names
         df_test["section"] = df_test["section"].str.lower().str.strip()
         # pmids to object
@@ -63,7 +62,7 @@ if __name__ == "__main__":
         ]
 
         # grouping by section
-        logger.info(f"Grouping by section...")
+        logger.info("Grouping by section...")
         collapsed = collapse_sections(df_filtered, "biocjson")
         # smaller texts within section
         logger.info(f"Smaller texts with max {max_tokens} tokens within section...")
@@ -95,17 +94,16 @@ if __name__ == "__main__":
 
         return exploded
 
-
     def keep_og_sentences(pmid, result):
         # TODO take more arguments e.g. keep_sections, filenaming prefix, output_path
-        # TODO docstrings 
+        # TODO docstrings
         # TODO checks
 
         logger.info(f"Now, passages to df and saved to: {output_path}")
         df_test = passages_to_df(result, output_path)
 
         # cleaning?
-        logger.info(f"Light cleaning")
+        logger.info("Light cleaning")
         # lower case section names
         df_test["section"] = df_test["section"].str.lower().str.strip()
         # pmids to object
@@ -113,7 +111,6 @@ if __name__ == "__main__":
         df_test["date"] = pd.to_datetime(df_test["date"])
         # also stripping sentences in case?
         df_test["sentence"] = df_test["sentence"].str.strip()
-        punctuations = ("!", ",", ".", "?", ",", '"', "'")
 
         # which sections to keep?
         keep_sections = ["abstract", "intro", "results", "discuss", "methods", "concl"]
@@ -135,7 +132,7 @@ if __name__ == "__main__":
             sentence_embeddings.detach().numpy().tolist()
         ).values
         # rename sentences to text
-        df_filtered = df_filtered.rename(columns=dict(sentence='text'))
+        df_filtered = df_filtered.rename(columns=dict(sentence="text"))
         # save to csv
         logger.info(f"Saving embeddings to {output_path}")
         df_filtered.to_csv(
@@ -144,10 +141,9 @@ if __name__ == "__main__":
 
         return df_filtered
 
-
     def gen_tsne():
         # TODO make reusable
-        # TODO docstrings 
+        # TODO docstrings
         # TODO checks
 
         # perplexity must be less than n_samples
@@ -187,7 +183,6 @@ if __name__ == "__main__":
         plt.savefig(tsne_fpath)
         logger.info(f"Tsne plot saved to {tsne_fpath}")
 
-
     ## GET ARGS
     # init
     args = get_args(
@@ -197,7 +192,7 @@ if __name__ == "__main__":
     ## START LOG FILE
     logger = get_logger()
     logger.info(f"Arguments: {args}")
-    
+
     ## LOAD CONFIG PARAMETERS
     # getting the config filepath
     config_filepath = args.config
@@ -232,7 +227,7 @@ if __name__ == "__main__":
     if args.files_downloaded:
         # check that the folder exists
         assert_path(args.files_downloaded)
-        logger.info(f"Skipping biocjson file retreival from pubtator.")
+        logger.info("Skipping biocjson file retreival from pubtator.")
         for i, pmid in enumerate(pmids):
             # get biocjson file
             matching_file = filter_filepaths(
@@ -264,7 +259,7 @@ if __name__ == "__main__":
             else:
                 logger.info(f"Biocjson file for {pmid} was None: {biocjson_fpath}")
     else:
-        logger.info(f"Retrieving biocjson from pubtator.")
+        logger.info("Retrieving biocjson from pubtator.")
         for i, pmid in enumerate(pmids):
             logger.info(f"Getting pubtator3 biocjson from api for {i}: {pmid}")
             result = get_biocjson(id=pmid, out_path=output_path, wait=1)
@@ -296,7 +291,7 @@ if __name__ == "__main__":
         gen_tsne()
     else:
         logger.info(
-            f"No tsne filepath provided in config file. Tsne plot not generated."
+            "No tsne filepath provided in config file. Tsne plot not generated."
         )
 
     logger.info("Complete.")

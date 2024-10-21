@@ -10,11 +10,10 @@ from pubmed_rag.utils import (
     assert_nonempty_vals,
     config_loader,
     get_args,
-    get_logger
+    get_logger,
 )
 
 if __name__ == "__main__":
-
     ## GET ARGS
     # init
     args = get_args(

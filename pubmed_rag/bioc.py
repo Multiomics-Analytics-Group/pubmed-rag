@@ -6,7 +6,6 @@ import time
 import nltk
 import pandas as pd
 import requests
-import torch
 
 from pubmed_rag.utils import assert_path, get_chunks
 

@@ -1,15 +1,8 @@
 # imports
-import json
-import os
-import time
 
-import pandas as pd
-import requests
 import torch
 import torch.nn.functional as F
 import transformers
-
-from pubmed_rag.utils import assert_path, get_chunks
 
 
 # Mean Pooling - Take attention mask into account for correct averaging
