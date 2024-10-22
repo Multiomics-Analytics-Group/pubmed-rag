@@ -47,15 +47,19 @@ if __name__ == "__main__":
     ## MAIN
     logger.info(f"Creating {db_name}")
 
+    # access or create database
     client = MilvusClient(f"{db_name}")
-    if client.has_collection(collection_name=col_name):  # TODO add to config?
+    # overwrite the collection in the database of exists
+    if client.has_collection(collection_name=col_name):
         client.drop_collection(collection_name=col_name)
+    # put in the data
     client.create_collection(
         collection_name=col_name, dimension=out_dim, metric_type=metric
     )
 
     logger.info(f"Reading in embeddings from folder: {output_path} ...")
-    df = pd.read_csv(os.path.join(output_path, "all_embeddings.csv"), sep="\t")
+    # read in embeddings from get_embeddings.py
+    df = pd.read_csv(os.path.join(output_path, "all_embeddings.csv"), sep="\t") #TODO put naming in config?
     # rename id and vector cols
     df = df.rename(
         columns={"Unnamed: 0": "id", "embedding": "vector"},
