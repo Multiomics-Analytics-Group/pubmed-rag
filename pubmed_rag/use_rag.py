@@ -12,7 +12,17 @@ from pubmed_rag.helpers.utils import (
 from pubmed_rag.run_search import find_similar_vectors
 
 
-def init_prompt(query: str, results: list) -> list:
+def init_prompt(
+    query: str,
+    results: list,
+    role: str,
+    task: str = """
+    Use the following pieces of information enclosed in <context> tags sourced from pubmed ids enclosed in <pmid> to provide an answer to the question enclosed in <question> tags.
+    Give priority to the context in descending order.
+    Please return the context quotes (and their pmids) that you used to support your answer.
+    """,
+) -> list:
+    # TODO this is too specific to BKGR
     """
         Thank you to the following resources:
         - PanKB (B Sun, L Pashkova, PA Pieters, AS Harke, OS Mohite, BO Palsson, PV Phaneuf
@@ -20,18 +30,12 @@ def init_prompt(query: str, results: list) -> list:
         - https://www.llama.com/docs/how-to-guides/prompting
     """
 
-    restrictions = """You can only use academic papers from pubmed or biorxiv or google scholar to support your answer. """
+    restrictions = """You can only use academic papers from pubmed or biorxiv or google scholar to support your answer."""
     role = """
     You are a biological/biomedical Knowledge graph (KG) LLM. You are a cautious assistant proficient in creating knowledge graphs for biological and biomedical use cases. 
     You are able to find answers to the questions from the contextual passage snippets provided and their affiliated pubmed articles.
     Please check the context information carefully and do not use information that is not relevant to the question.
     If the retrieved context does not provide useful information to answer the question, say that you do not know.
-    """
-
-    the_task = """
-    Use the following pieces of information enclosed in <context> tags sourced from pubmed ids enclosed in <pmid> to provide an answer to the question enclosed in <question> tags.
-    Give priority to the context in descending order.
-    Please return the context quotes (and their pmids) that you used to support your answer.
     """
 
     question = f"<question>{query}</question>"
@@ -44,7 +48,7 @@ def init_prompt(query: str, results: list) -> list:
         """
 
     system_content = f"{role} Restrictions: {restrictions}"
-    user_content = the_task + question + the_context
+    user_content = task + question + the_context
 
     system_prompt = {"role": "system", "content": system_content}
 
