@@ -29,13 +29,10 @@ from pubmed_rag.helpers.utils import (
 if __name__ == "__main__":
     ## HELPERS? keep inside main for now
 
-    def into_sections(pmid, result):
+    def into_sections(pmid, df_test):
         # TODO take more arguments e.g. keep_sections, filenaming prefix, output_path
         # TODO docstrings
         # TODO checks
-
-        logger.info(f"Now, passages to df and saved to: {output_path}")
-        df_test = passages_to_df(result, output_path)
 
         # cleaning?
         logger.info("Light cleaning")
@@ -57,50 +54,53 @@ if __name__ == "__main__":
         keep_sections = ["abstract", "intro", "results", "discuss", "methods", "concl"]
         # filter
         df_filtered = df_test[df_test["section"].isin(keep_sections)].copy()
+        # only keeping sentences with more than 5 words
         df_filtered = df_filtered[
             df_filtered["sentence"].apply(lambda x: len(x.split()) > 5)
         ]
 
-        # grouping by section
-        logger.info("Grouping by section...")
-        collapsed = collapse_sections(df_filtered, "biocjson")
-        # smaller texts within section
-        logger.info(f"Smaller texts with max {max_tokens} tokens within section...")
-        for i, section in enumerate(collapsed["text"]):
-            smaller = get_smaller_texts(section, max_tokens)
-            collapsed.at[i, "text"] = smaller
-        exploded = collapsed.explode("text")
-        exploded.to_csv(
-            os.path.join(output_path, f"sectioned_{pmid}.csv"), index=False, sep="\t"
-        )
+        # if the dataframe is not empty basically
+        if len(df_filtered) > 0:
+            # grouping by section
+            logger.info("Grouping by section...")
+            collapsed = collapse_sections(df_filtered, output_path)
+            # smaller texts within section
+            logger.info(f"Smaller texts with max {max_tokens} tokens within section...")
+            for i, section in enumerate(collapsed["text"]):
+                smaller = get_smaller_texts(section, max_tokens)
+                collapsed.at[i, "text"] = smaller
+            exploded = collapsed.explode("text")
+            exploded.to_csv(
+                os.path.join(output_path, f"sectioned_{pmid}.csv"), index=False, sep="\t"
+            )
 
-        # GET EMBEDDINGS
-        logger.info(f"Getting embeddings for {pmid}")
-        # Tokenize sentences
-        encoded_input = get_tokens(tokenizer, exploded["text"].to_list())
-        # get embeddings
-        sentence_embeddings = get_sentence_embeddings(model, encoded_input)
+            # GET EMBEDDINGS
+            logger.info(f"Getting embeddings for {pmid}")
+            # Tokenize sentences
+            encoded_input = get_tokens(tokenizer, exploded["text"].to_list())
+            # get embeddings
+            sentence_embeddings = get_sentence_embeddings(model, encoded_input)
 
-        # append back to df
-        exploded["embedding"] = pd.Series(
-            sentence_embeddings.detach().numpy().tolist()
-        ).values
+            # append back to df
+            exploded["embedding"] = pd.Series(
+                sentence_embeddings.detach().numpy().tolist()
+            ).values
 
-        # save to csv
-        logger.info(f"Saving embeddings to {output_path}")
-        exploded.to_csv(
-            os.path.join(output_path, f"embed_{pmid}.csv"), index=False, sep="\t"
-        )
+            # save to csv
+            logger.info(f"Saving embeddings to {output_path}")
+            exploded.to_csv(
+                os.path.join(output_path, f"embed_{pmid}.csv"), index=False, sep="\t"
+            )
 
-        return exploded
+            return exploded
+        else:
+            logger.info(f"Embeddings not retrieved for {pmid}: No sentences.")
 
-    def keep_og_sentences(pmid, result):
+
+    def keep_og_sentences(pmid, df_test):
         # TODO take more arguments e.g. keep_sections, filenaming prefix, output_path
         # TODO docstrings
         # TODO checks
-
-        logger.info(f"Now, passages to df and saved to: {output_path}")
-        df_test = passages_to_df(result, output_path)
 
         # cleaning?
         logger.info("Light cleaning")
@@ -250,12 +250,18 @@ if __name__ == "__main__":
                 result = json.load(f)
             # tokenizing and embedding
             if result is not None:
-                if section_flag:
-                    df = into_sections(pmid, result)
+                logger.info(f"Now, passages to df and saved to: {output_path}")
+                df_test = passages_to_df(result, output_path)
+                if len(df_test) > 0:
+                    if section_flag:
+                        df = into_sections(pmid, df_test)
+                    else:
+                        df = keep_og_sentences(pmid, df_test)
+                    # store for tsne
+                    if df is not None:
+                        df_embeddings[pmid] = df
                 else:
-                    df = keep_og_sentences(pmid, result)
-                # store for tsne
-                df_embeddings[pmid] = df
+                    logger.info(f"Embeddings not retrieved for {pmid}: No sentences.")
             else:
                 logger.info(f"Biocjson file for {pmid} was None: {biocjson_fpath}")
     else:
@@ -266,12 +272,18 @@ if __name__ == "__main__":
             logger.info(f"Saved to {output_path}.")
             # tokenizing and embedding
             if result is not None:
-                if section_flag:
-                    df = into_sections(pmid, result)
+                logger.info(f"Now, passages to df and saved to: {output_path}")
+                df_test = passages_to_df(result, output_path)
+                if len(df_test) > 0:
+                    if section_flag:
+                        df = into_sections(pmid, df_test)
+                    else:
+                        df = keep_og_sentences(pmid, df_test)
+                    # store for tsne
+                    if df is not None:
+                        df_embeddings[pmid] = df
                 else:
-                    df = keep_og_sentences(pmid, result)
-                # store for tsne
-                df_embeddings[pmid] = df
+                    logger.info(f"Embeddings not retrieved for {pmid}: No sentences.")
             else:
                 logger.info(f"Result for {pmid} was None.")
 
