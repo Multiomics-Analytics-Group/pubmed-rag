@@ -29,6 +29,7 @@ pymilvus = "^2.4.6"
 accelerate = "^1.0.0"
 ipykernel = "^6.29.5"
 ruff = "^0.7.0"
+ollama = "^0.3.3"
 
 
 [build-system]
