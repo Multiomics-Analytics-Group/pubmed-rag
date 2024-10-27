@@ -1,5 +1,6 @@
 # import
 import json
+import logging
 
 from pymilvus import MilvusClient
 from transformers import AutoModel, AutoTokenizer
@@ -14,9 +15,13 @@ from pubmed_rag.helpers.utils import (
 )
 
 
-def find_similar_vectors(path_to_config: str, query: str, logging: bool = False):
+def find_similar_vectors(
+        path_to_config: str, 
+        query: str, 
+        logger: logging.Logger|None = None
+    ):
     # allow logging if ran as script
-    if logging:
+    if logger:
         verbose = logger.info
     else:
         verbose = print
@@ -41,6 +46,11 @@ def find_similar_vectors(path_to_config: str, query: str, logging: bool = False)
     ## MAIN
     verbose(f"Accessing {db_name}")
     client = MilvusClient(db_name)
+    verbose(f"{db_name} has collections: {client.list_collections()}")
+    # check collection exists
+    assert client.has_collection(
+        col_name
+    ), f"{col_name} collection doesn't exist in {db_name}"
 
     verbose(f"Loading model {chosen_model} from HuggingFace")
     tokenizer = AutoTokenizer.from_pretrained(chosen_model)
@@ -82,7 +92,7 @@ if __name__ == "__main__":
     result = find_similar_vectors(
         path_to_config=args.config,
         query=args.query,
-        logging=True,
+        logger=logger,
     )
     logger.info(f"Query: {args.query}")
     logger.info("Results:")
