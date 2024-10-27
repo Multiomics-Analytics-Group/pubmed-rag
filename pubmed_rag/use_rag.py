@@ -56,34 +56,43 @@ def init_prompt(
     return prompt
 
 
-def llama3(prompt: list, model="llama3.1") -> str:
+def llama3(
+        prompt: list, 
+        api: str = "http://localhost:11434/api/chat", 
+        model: str = "llama3.1",
+        num_ctx: int = 4096  # Added parameter for context length
+    ) -> str:
     """
-    getting response from llama3 LLM
+    Getting response from llama3 LLM
     https://www.llama.com/docs/llama-everywhere/running-meta-llama-on-mac/
 
     :param prompt: A list of dictionaries with the prompts to the model
     :type prompt: list
     :param model: The name of the llama LLM version
     :type model: str
-
-    :param return: The LLMs response?
+    :param num_ctx: The context length for handling larger prompts
+    :type num_ctx: int
+    :return: The LLM's response
     :rtype: str
     """
     data = {
         "model": model,
         "messages": prompt,
+        "options": {
+            "num_ctx": num_ctx  # Include the context length in the request
+        },
         "stream": False,
     }
 
     headers = {"Content-Type": "application/json"}
 
-    response = requests.post(llama_api, headers=headers, json=data)
+    response = requests.post(api, headers=headers, json=data)
 
     if response.status_code == 200:
         return response.json()["message"]["content"]
     else:
         raise ConnectionError(
-            "There was an issue with the model and/or api. Please check ollama."
+            "There was an issue with the model and/or API. Please check Ollama."
         )
 
 
