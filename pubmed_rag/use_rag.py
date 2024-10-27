@@ -15,45 +15,37 @@ from pubmed_rag.run_search import find_similar_vectors
 def init_prompt(
     query: str,
     results: list,
-    role: str,
+    role: str = """
+    You are a cautious AI assistant. You are able to find concise answers to the questions from the contextual passage snippets provided and their affiliated pubmed articles.
+    Please check the context information carefully and do not use information that is not relevant to the question.
+    If the retrieved context does not provide useful information to answer the question, say that you do not know.
+    """,
     task: str = """
     Use the following pieces of information enclosed in <context> tags sourced from pubmed ids enclosed in <pmid> to provide an answer to the question enclosed in <question> tags.
-    Give priority to the context in descending order.
-    Please return the context quotes (and their pmids) that you used to support your answer.
     """,
 ) -> list:
-    # TODO this is too specific to BKGR
     """
+    TODO: complete docstring ..
         Thank you to the following resources:
         - PanKB (B Sun, L Pashkova, PA Pieters, AS Harke, OS Mohite, BO Palsson, PV Phaneuf
     bioRxiv 2024.08.16.608241; doi: https://doi.org/10.1101/2024.08.16.608241)
         - https://www.llama.com/docs/how-to-guides/prompting
     """
 
-    restrictions = """You can only use academic papers from pubmed or biorxiv or google scholar to support your answer."""
-    role = """
-    You are a biological/biomedical Knowledge graph (KG) LLM. You are a cautious assistant proficient in creating knowledge graphs for biological and biomedical use cases. 
-    You are able to find answers to the questions from the contextual passage snippets provided and their affiliated pubmed articles.
-    Please check the context information carefully and do not use information that is not relevant to the question.
-    If the retrieved context does not provide useful information to answer the question, say that you do not know.
-    """
-
+    # prepare question
     question = f"<question>{query}</question>"
 
+    # prepare context section
     the_context = ""
     metadata = [x["entity"] for x in results]
-
     for data in metadata:
         the_context += f"""<context>{data['text']}</context> <pmid>{str(data['pmid'])}</pmid>
         """
-
-    system_content = f"{role} Restrictions: {restrictions}"
+    # putting it together
     user_content = task + question + the_context
-
-    system_prompt = {"role": "system", "content": system_content}
-
+    # in format for llama
+    system_prompt = {"role": "system", "content": role}
     user_prompt = {"role": "user", "content": user_content}
-
     prompt = [system_prompt, user_prompt]
 
     ## POST CONDITIONS
