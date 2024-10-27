@@ -18,9 +18,11 @@ Work in progress..
 
 ## 2. Creating the Vector Database
 
+### Option A) Run python scripts manually
+
 #### 2.a) Retrieving the pubmed articles
 
-Using get_embeddings.py
+Using pubmed_rag/get_embeddings.py
 `python pubmed_rag/get_embeddings.py --config <path to config file>`
 
 Args:
@@ -33,7 +35,7 @@ Examples:
 
 #### 2.b) Putting the embeddings into a vector database
 
-Using create_db.py
+Using pubmed_rag/create_db.py
 `python pubmed_rag/create_db.py --config <path to config file>`
 
 Args:
@@ -43,11 +45,24 @@ Examples:
 - `python pubmed_rag/create_db.py -c demo/config.yaml`
 - `python pubmed_rag/create_db.py --config /users/blah/what/config.yaml`
 
+### Option B) Run bash script (Recommended)
+
+Instead, using get_pmid_vdb.sh which will carry out 2.a) and 2.b)
+`bash get_pmid_vdb.sh --files_downloaded <path to folder with biocjson files> --config  <path to config file>`
+
+Args:
+- `--config` or `-c <path to config file>` 
+- `--files_downloaded` or `-fd <path to folder with biocjson files>`
+
+Examples:
+- `bash get_pmid_vdb.sh --config demo/config.yaml`
+- `bash get_pmid_vdb.sh -fd demo/output -c /users/blah/what/config.yaml`
+
 ## Querying the database
 
 #### Find nearest vectors
 
-Using run_search.py
+Using pubmed_rag/run_search.py
 `python pubmed_rag/run_search.py --config <path to config file> --query <the LLM prompt>`
 
 Args:
