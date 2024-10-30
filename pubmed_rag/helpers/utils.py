@@ -144,6 +144,26 @@ def config_loader(filepath: str) -> dict:
     return contents
 
 
+def filter_config(config:dict, additional:list=["pubmed_rag"])->dict:
+    """TODO"""
+
+    ## PRECONDITION
+    if not isinstance(config, dict):
+        raise TypeError(f"config must be a dict: {type(config)}")
+    if not isinstance(additional, list):
+        raise TypeError(f"additional must be a list: {type(additional)}")
+    
+    ## MAIN FUNCTION
+    # which keys in config to keep
+    keep = [get_basename()] + additional
+
+    filtered_config = {
+        k:v for (k,v) in config.items() if k in keep
+    }
+
+    return filter_config
+
+
 def get_args(prog_name: str, others: dict = {}):
     """
     Initiates argparse.ArugmentParser() and adds common arguments.
