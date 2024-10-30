@@ -277,9 +277,8 @@ def get_smaller_texts(text: str, max_tokens: int) -> list:
     counter = 0
     for each in collection:
         counts = len(word_tokenize(each))
-        assert (
-            counts <= max_tokens
-        ), f"{counts} Sentence has more than {max_tokens} tokens: \n {each}"
+        if not counts <= max_tokens:
+            print(f"{counts} Sentence has more than {max_tokens} tokens: \n {each}")
         counter += counts
     # checking that the num tokens organised in 'collection' are same as original
     original_count = len(word_tokenize(text))
