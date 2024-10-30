@@ -21,7 +21,8 @@ def init_prompt(
     If the retrieved context does not provide useful information to answer the question, say that you do not know.
     """,
     task: str = """
-    Use the following pieces of information enclosed in <context> tags sourced from pubmed ids enclosed in <pmid> to provide an answer to the question enclosed in <question> tags.
+    Use the following pieces of information enclosed in <context> tags to provide an answer to the question enclosed in <question> tags.
+    The context tags also have the attribute `pmid` which is the pubmed ID of the publication the <context> is from.
     """,
 ) -> list:
     """
@@ -39,7 +40,7 @@ def init_prompt(
     the_context = ""
     metadata = [x["entity"] for x in results]
     for data in metadata:
-        the_context += f"""<context>{data['text']}</context> <pmid>{str(data['pmid'])}</pmid>
+        the_context += f"""<context pmid={str(data['pmid'])}>{data['text']}</context>
         """
     # putting it together
     user_content = task + question + the_context
@@ -114,7 +115,7 @@ if __name__ == "__main__":
     logger.info(f"Path to config file: {config_filepath}")
     # load config params
     logger.info("Loading config params ... ")
-    config = config_loader(config_filepath)
+    config = config_loader(config_filepath)["pubmed_rag"]
     assert_nonempty_keys(config)
     assert_nonempty_vals(config)
     llama_model = config["llama model"]
