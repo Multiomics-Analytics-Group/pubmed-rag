@@ -15,7 +15,12 @@ from pubmed_rag.helpers.bioc import (
     get_smaller_texts,
     passages_to_df,
 )
-from pubmed_rag.helpers.model import get_sentence_embeddings, get_tokens
+from pubmed_rag.helpers.model import (
+    get_sentence_embeddings, 
+    get_tokens,
+    mean_pooling,
+    attention_pooling
+)
 from pubmed_rag.helpers.utils import (
     assert_nonempty_keys,
     assert_nonempty_vals,
@@ -79,7 +84,7 @@ if __name__ == "__main__":
             # Tokenize sentences
             encoded_input = get_tokens(tokenizer, exploded["text"].to_list())
             # get embeddings
-            sentence_embeddings = get_sentence_embeddings(model, encoded_input)
+            sentence_embeddings = get_sentence_embeddings(model, encoded_input, pooling_function)
 
             # append back to df
             exploded["embedding"] = pd.Series(
@@ -126,7 +131,7 @@ if __name__ == "__main__":
         # Tokenize sentences
         encoded_input = get_tokens(tokenizer, df_filtered["sentence"].to_list())
         # get embeddings
-        sentence_embeddings = get_sentence_embeddings(model, encoded_input)
+        sentence_embeddings = get_sentence_embeddings(model, encoded_input, pooling_function)
         # append back to df
         df_filtered["embedding"] = pd.Series(
             sentence_embeddings.detach().numpy().tolist()
@@ -200,7 +205,7 @@ if __name__ == "__main__":
     logger.info(f"Path to config file: {config_filepath}")
     # load config params
     logger.info("Loading config params ... ")
-    config = config_loader(config_filepath)
+    config = config_loader(config_filepath)["pubmed_rag"]
     assert_nonempty_keys(config)
     assert_nonempty_vals(config)
     pmid_path = config["pmid file path"]
@@ -209,6 +214,15 @@ if __name__ == "__main__":
     chosen_model = config["transformer_model"]
     tsne_fpath = config["tsne"]
     section_flag = config["condense sections"]
+    pooling_choice = config["pooling"]
+    pooling_map = {
+        'mean_pooling':mean_pooling,
+        'attention_pooling':attention_pooling
+    }
+    if pooling_choice not in pooling_map:
+        raise ValueError(f"pooling not in options: {pooling_map.keys()}")
+    else:
+        pooling_function = pooling_map[pooling_choice]
     logger.info(f"Configuration: {config}")
 
     ## MAIN

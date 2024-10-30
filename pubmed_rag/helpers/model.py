@@ -20,6 +20,13 @@ def mean_pooling(model_output, attention_mask):
         input_mask_expanded.sum(1), min=1e-9
     )
 
+def attention_pooling(model_output, attention_scores):
+    token_embeddings = model_output[0]
+    # Ensure attention_scores are of type float
+    attention_scores = attention_scores.float()
+    attention_weights = F.softmax(attention_scores, dim=-1)
+    return torch.sum(token_embeddings * attention_weights.unsqueeze(-1), dim=1)
+
 
 def get_tokens(
     tokenizer: transformers.AutoTokenizer,
@@ -64,6 +71,7 @@ def get_tokens(
 def get_sentence_embeddings(
     model: transformers.AutoModel,
     encoded_input: transformers.BatchEncoding,
+    pooling_function=attention_pooling
 ) -> torch.Tensor:
     """
     Uses a given model from Hugging Face to embed a list of sentences
@@ -90,7 +98,7 @@ def get_sentence_embeddings(
         model_output = model(**encoded_input)
 
     # Perform pooling
-    sentence_embeddings = mean_pooling(model_output, encoded_input["attention_mask"])
+    sentence_embeddings = pooling_function(model_output, encoded_input["attention_mask"])
 
     # Normalize embeddings
     sentence_embeddings = F.normalize(sentence_embeddings, p=2, dim=1)
