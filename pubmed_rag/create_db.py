@@ -32,7 +32,7 @@ if __name__ == "__main__":
     logger.info(f"Path to config file: {config_filepath}")
     # load config params
     logger.info("Loading config params ... ")
-    config = config_loader(config_filepath)
+    config = config_loader(config_filepath)['pubmed_rag']
     assert_nonempty_keys(config)
     assert_nonempty_vals(config)
     pmid_path = config["pmid file path"]

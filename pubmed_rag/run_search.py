@@ -33,7 +33,7 @@ def find_similar_vectors(
     verbose(f"Path to config file: {config_filepath}")
     # load config params
     verbose("Loading config params ... ")
-    config = config_loader(config_filepath)
+    config = config_loader(config_filepath)["pubmed_rag"]
     assert_nonempty_keys(config)
     assert_nonempty_vals(config)
     chosen_model = config["transformer_model"]
