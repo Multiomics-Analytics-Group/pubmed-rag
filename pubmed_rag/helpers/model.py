@@ -20,6 +20,7 @@ def mean_pooling(model_output, attention_mask):
         input_mask_expanded.sum(1), min=1e-9
     )
 
+
 def attention_pooling(model_output, attention_scores):
     token_embeddings = model_output[0]
     # Ensure attention_scores are of type float
@@ -27,6 +28,47 @@ def attention_pooling(model_output, attention_scores):
     attention_weights = F.softmax(attention_scores, dim=-1)
     return torch.sum(token_embeddings * attention_weights.unsqueeze(-1), dim=1)
 
+
+def map_pooling(pooling:str):
+    """
+    Retrieve the pooling function based on the given pooling type.
+
+    This function maps a string representing the pooling type to the corresponding
+    pooling function. It raises a TypeError if the input is not a string and a
+    ValueError if the pooling type is not recognized.
+
+    :param pooling: The type of pooling to be used. Must be one of 'mean_pooling' or 'attention_pooling'.
+    :type pooling: str
+    :raises TypeError: If the input is not a string.
+    :raises ValueError: If the pooling type is not recognized.
+    :return: The corresponding pooling function.
+    :rtype: function
+
+    :Example:
+
+    >>> map_pooling('mean_pooling')
+    <function mean_pooling at 0x...>
+    >>> map_pooling('attention_pooling')
+    <function attention_pooling at 0x...>
+    """
+    
+    ## PRECONDITIONS
+    # define options
+    pooling_map = {
+        'mean_pooling':mean_pooling,
+        'attention_pooling':attention_pooling
+    }
+    if not isinstance(pooling, str):
+        raise TypeError(f"pooling must be a str: {type(pooling)}")    
+    if not pooling in pooling_map:
+        raise ValueError(
+            f"pooling of {pooling} not an option in {pooling_map.keys()}"
+        )
+    
+    ## MAIN FUNCTION
+    # retrieving pooling function
+    pooling_function = pooling_map[pooling]
+    return pooling_function
 
 def get_tokens(
     tokenizer: transformers.AutoTokenizer,
