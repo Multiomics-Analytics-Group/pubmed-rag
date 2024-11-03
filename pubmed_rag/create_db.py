@@ -3,11 +3,7 @@ import os
 from ast import literal_eval
 
 import pandas as pd
-from pymilvus import (
-    MilvusClient, 
-    db,
-    utility
-)
+from pymilvus import MilvusClient
 
 from pubmed_rag.helpers.utils import (
     assert_nonempty_keys,
@@ -61,14 +57,17 @@ if __name__ == "__main__":
         uri=uri
     )    
     # create db if doesn't exist
-    if db_name not in db.list_database():
+    if db_name not in client.list_databases():
         logger.info(f"Creating {db_name}")
-        db.create_database(db_name)
+        client.create_database(db_name)
     else:
-        logger.info(f"{db_name} already exists in {db.list_database()}")
+        logger.info(f"{db_name} already exists in {client.list_databases()}")
     # use db
     logger.info(f"Using {db_name}")
-    db.using_database(db_name)
+    client = MilvusClient(
+        uri=uri,
+        db_name=db_name
+    )    
     # overwrite the given collection in the database if exists
     if client.has_collection(collection_name=col_name):
         client.drop_collection(collection_name=col_name)
@@ -87,6 +86,7 @@ if __name__ == "__main__":
     )
     # ensure vector is a list
     df["vector"] = df["vector"].apply(literal_eval)
+    df = df.fillna("Unknown")
     # to list of dicts
     data = df.to_dict(orient="records")
     logger.info(f"Number of embeddings is: {len(data)}")
