@@ -6,6 +6,7 @@ import os
 import sys
 import warnings
 from datetime import datetime
+from urllib.parse import urlparse, urlunsplit
 
 import yaml
 
@@ -110,6 +111,50 @@ def warn_folder(
         warnings.warn(warning_message, UserWarning)
 
         return warning_message
+
+
+def normalize_url(host:str, port:int)->str:
+    """
+    Normalize the given URL. Ensure the URL starts with 'http://'
+
+    This function takes a URL and normalizes it by ensuring it has a scheme,
+    converting it to lowercase, and removing any trailing slashes.
+
+    :param url: The URL to be normalized.
+    :type url: str
+    :param port: The port
+    :type port: int
+    :return: The normalized URL.
+    :rtype: str
+
+    :Example:
+
+    >>> normalize_url('HTTP://Example.com/')
+    'http://example.com'
+    """
+    ## PRECONDITIONS
+    if not isinstance(host, str):
+        raise TypeError(f"host should be a str e.g., 'localhost': {type(host)}")
+    if not isinstance(port, int):
+        raise TypeError(f"port must be int e.g., '7474': {type(port)}")
+        
+    ## MAIN FUNCTION
+    if not urlparse(host).netloc:
+        host = urlunsplit(
+            parts=['http', host, '', '', '']
+        )
+    
+    # Remove any trailing slashes
+    url = host.rstrip('/')
+    
+    # Add the port
+    url = f"{url}:{str(port)}"
+
+    ## POSTCOND CHECKS
+    if not urlparse(url).netloc:
+        raise TypeError(f"Unable to normalize url: {url}")
+    
+    return url
 
 
 # FUNCTIONS FOR CONFIG
