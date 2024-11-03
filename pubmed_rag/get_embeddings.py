@@ -264,9 +264,9 @@ if __name__ == "__main__":
                 df_test = passages_to_df(result, output_path)
                 if len(df_test) > 0:
                     if section_flag:
-                        df = into_sections(pmid, df_test)
+                        df = into_sections(pmid, df_test, pooling_function)
                     else:
-                        df = keep_og_sentences(pmid, df_test)
+                        df = keep_og_sentences(pmid, df_test, pooling_function)
                     # store for tsne
                     if df is not None:
                         df_embeddings[pmid] = df
@@ -286,9 +286,9 @@ if __name__ == "__main__":
                 df_test = passages_to_df(result, output_path)
                 if len(df_test) > 0:
                     if section_flag:
-                        df = into_sections(pmid, df_test)
+                        df = into_sections(pmid, df_test, pooling_function)
                     else:
-                        df = keep_og_sentences(pmid, df_test)
+                        df = keep_og_sentences(pmid, df_test, pooling_function)
                     # store for tsne
                     if df is not None:
                         df_embeddings[pmid] = df
