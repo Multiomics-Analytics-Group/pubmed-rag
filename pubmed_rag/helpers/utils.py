@@ -141,7 +141,7 @@ def normalize_url(host:str, port:int)->str:
     ## MAIN FUNCTION
     if not urlparse(host).netloc:
         host = urlunsplit(
-            parts=['http', host, '', '', '']
+            ['http', host, '', '', '']
         )
     
     # Remove any trailing slashes
