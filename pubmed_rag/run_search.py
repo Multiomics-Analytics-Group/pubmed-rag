@@ -3,15 +3,21 @@ import json
 import logging
 
 from pymilvus import MilvusClient
+
 from transformers import AutoModel, AutoTokenizer
 
-from pubmed_rag.helpers.model import get_sentence_embeddings, get_tokens
+from pubmed_rag.helpers.model import (
+    get_sentence_embeddings, 
+    get_tokens, 
+    map_pooling
+)
 from pubmed_rag.helpers.utils import (
     assert_nonempty_keys,
     assert_nonempty_vals,
     config_loader,
     get_args,
     get_logger,
+    normalize_url
 )
 
 
@@ -36,7 +42,11 @@ def find_similar_vectors(
     config = config_loader(config_filepath)["pubmed_rag"]
     assert_nonempty_keys(config)
     assert_nonempty_vals(config)
-    chosen_model = config["transformer_model"]
+    chosen_model = config["transformer_model"],
+    pooling_choice = config["pooling"]
+
+    host_name = config["host"]
+    port = config["port"]
     db_name = config["db name"]
     col_name = config["collection name"]
     n_results = config["n_results"]
@@ -44,24 +54,30 @@ def find_similar_vectors(
     verbose(f"Configuration: {config}")
 
     ## MAIN
-    verbose(f"Accessing {db_name}")
-    client = MilvusClient(db_name)
-    verbose(f"{db_name} has collections: {client.list_collections()}")
-    # check collection exists
-    assert client.has_collection(
-        col_name
-    ), f"{col_name} collection doesn't exist in {db_name}"
+    # check and retrieve pooling 
+    pooling_function = map_pooling(pooling_choice)
+    # get and check uri
+    uri = normalize_url(host_name, port)
+    verbose(f"Connecting to {uri} and using {db_name}...")
+    # connect
+    client = MilvusClient(
+        uri=uri,
+        db_name=db_name
+    )    
+    # check col exists
+    if not client.has_collection(collection_name=col_name):
+        verbose(f"{db_name} does not have collection {col_name}: {client.list_collections()}")
 
     verbose(f"Loading model {chosen_model} from HuggingFace")
     tokenizer = AutoTokenizer.from_pretrained(chosen_model)
     model = AutoModel.from_pretrained(chosen_model)
 
-    # GET EMBEDDINGS
+    # GET EMBEDDING
     verbose(f"Embedding query: {query}")
-    # Tokenize sentences
+    # Tokenize query
     encoded_input = get_tokens(tokenizer, [query])
     # get embeddings
-    sentence_embeddings = get_sentence_embeddings(model, encoded_input)
+    sentence_embeddings = get_sentence_embeddings(model, encoded_input, pooling_function)
 
     ## RUN QUERY
     verbose("Searching against vector database")
@@ -81,7 +97,8 @@ if __name__ == "__main__":
     ## GET ARGS
     # init
     args = get_args(
-        prog_name="run_search", others=dict(description="queries the vector db")
+        prog_name="run_search", 
+        others=dict(description="queries the vector db")
     )
 
     ## START LOG FILE
