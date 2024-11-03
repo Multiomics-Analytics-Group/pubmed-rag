@@ -166,3 +166,4 @@ cython_debug/
 *.csv
 *.db
 *.db.lock
+*.DS_Store
