@@ -42,7 +42,7 @@ def find_similar_vectors(
     config = config_loader(config_filepath)["pubmed_rag"]
     assert_nonempty_keys(config)
     assert_nonempty_vals(config)
-    chosen_model = config["transformer_model"],
+    chosen_model = config["transformer_model"]
     pooling_choice = config["pooling"]
 
     host_name = config["host"]
