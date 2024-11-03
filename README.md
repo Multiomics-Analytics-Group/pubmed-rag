@@ -14,6 +14,8 @@ Work in progress..
     - `cd` into repo directory
     - running `poetry install`
 4. activate the environment by running `poetry shell` in repo dir
+5. a running instance of the Milvus
+
 5. download ollama and set up account
 
 ## 2. Creating the Vector Database
