@@ -18,8 +18,7 @@ from pubmed_rag.helpers.bioc import (
 from pubmed_rag.helpers.model import (
     get_sentence_embeddings, 
     get_tokens,
-    mean_pooling,
-    attention_pooling
+    map_pooling,
 )
 from pubmed_rag.helpers.utils import (
     assert_nonempty_keys,
@@ -34,7 +33,7 @@ from pubmed_rag.helpers.utils import (
 if __name__ == "__main__":
     ## HELPERS? keep inside main for now
 
-    def into_sections(pmid, df_test):
+    def into_sections(pmid, df_test, pooling_function):
         # TODO take more arguments e.g. keep_sections, filenaming prefix, output_path
         # TODO docstrings
         # TODO checks
@@ -102,7 +101,7 @@ if __name__ == "__main__":
             logger.info(f"Embeddings not retrieved for {pmid}: No sentences.")
 
 
-    def keep_og_sentences(pmid, df_test):
+    def keep_og_sentences(pmid, df_test, pooling_function):
         # TODO take more arguments e.g. keep_sections, filenaming prefix, output_path
         # TODO docstrings
         # TODO checks
@@ -145,6 +144,7 @@ if __name__ == "__main__":
         )
 
         return df_filtered
+
 
     def gen_tsne():
         # TODO make reusable
@@ -191,7 +191,8 @@ if __name__ == "__main__":
     ## GET ARGS
     # init
     args = get_args(
-        prog_name="embedder", others=dict(description="generates embeddings")
+        prog_name="embedder", 
+        others=dict(description="generates embeddings")
     )
 
     ## START LOG FILE
@@ -215,17 +216,12 @@ if __name__ == "__main__":
     tsne_fpath = config["tsne"]
     section_flag = config["condense sections"]
     pooling_choice = config["pooling"]
-    pooling_map = {
-        'mean_pooling':mean_pooling,
-        'attention_pooling':attention_pooling
-    }
-    if pooling_choice not in pooling_map:
-        raise ValueError(f"pooling not in options: {pooling_map.keys()}")
-    else:
-        pooling_function = pooling_map[pooling_choice]
     logger.info(f"Configuration: {config}")
 
     ## MAIN
+    # check and retrieve pooling 
+    pooling_function = map_pooling(pooling_choice)
+    # init to put data for vector db
     df_embeddings = {}
 
     logger.info(f"Loading model {chosen_model} from HuggingFace")
