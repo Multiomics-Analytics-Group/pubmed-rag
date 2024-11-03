@@ -3,7 +3,11 @@ import os
 from ast import literal_eval
 
 import pandas as pd
-from pymilvus import MilvusClient
+from pymilvus import (
+    MilvusClient, 
+    db,
+    utility
+)
 
 from pubmed_rag.helpers.utils import (
     assert_nonempty_keys,
@@ -11,6 +15,7 @@ from pubmed_rag.helpers.utils import (
     config_loader,
     get_args,
     get_logger,
+    normalize_url
 )
 
 if __name__ == "__main__":
@@ -38,6 +43,9 @@ if __name__ == "__main__":
     pmid_path = config["pmid file path"]
     output_path = config["biocjson output path"]
     chosen_model = config["transformer_model"]
+
+    host_name = config["host"]
+    port = config["port"]
     db_name = config["db name"]
     col_name = config["collection name"]
     out_dim = config["output_dimensions"]
@@ -45,20 +53,33 @@ if __name__ == "__main__":
     logger.info(f"Configuration: {config}")
 
     ## MAIN
-    logger.info(f"Creating {db_name}")
-
-    # access or create database
-    client = MilvusClient(f"{db_name}")
-    # overwrite the collection in the database of exists
+    # get and check uri
+    uri = normalize_url(host_name, port)
+    logger.info(f"Connecting to {uri}...")
+    # connect
+    client = MilvusClient(
+        uri=uri
+    )    
+    # create db if doesn't exist
+    if db_name not in db.list_database():
+        logger.info(f"Creating {db_name}")
+        db.create_database(db_name)
+    else:
+        logger.info(f"{db_name} already exists in {db.list_database()}")
+    # use db
+    logger.info(f"Using {db_name}")
+    db.using_database(db_name)
+    # overwrite the given collection in the database if exists
     if client.has_collection(collection_name=col_name):
         client.drop_collection(collection_name=col_name)
-    # put in the data
+        logger.info(f"Overwriting existing {col_name}")
+    # init the collection
     client.create_collection(
         collection_name=col_name, dimension=out_dim, metric_type=metric
     )
 
-    logger.info(f"Reading in embeddings from folder: {output_path} ...")
     # read in embeddings from get_embeddings.py
+    logger.info(f"Reading in embeddings from folder: {output_path} ...")
     df = pd.read_csv(os.path.join(output_path, "all_embeddings.csv"), sep="\t") #TODO put naming in config?
     # rename id and vector cols
     df = df.rename(
