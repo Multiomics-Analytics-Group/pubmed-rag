@@ -1,6 +1,7 @@
 # import
 
 import requests
+import ollama
 
 from pubmed_rag.helpers.utils import (
     assert_nonempty_keys,
@@ -34,7 +35,7 @@ def init_prompt(
     """
 
     # prepare question
-    question = f"<question>{query}</question>"
+    question = f"<question>{query}</question>\n"
 
     # prepare context section
     the_context = ""
@@ -59,9 +60,7 @@ def init_prompt(
 
 def llama3(
         prompt: list, 
-        api: str = "http://localhost:11434/api/chat", 
         model: str = "llama3.1",
-        num_ctx: int = 4096  # Added parameter for context length
     ) -> str:
     """
     Getting response from llama3 LLM
@@ -71,31 +70,16 @@ def llama3(
     :type prompt: list
     :param model: The name of the llama LLM version
     :type model: str
-    :param num_ctx: The context length for handling larger prompts
-    :type num_ctx: int
     :return: The LLM's response
     :rtype: str
     """
-    data = {
-        "model": model,
-        "messages": prompt,
-        "options": {
-            "num_ctx": num_ctx  # Include the context length in the request
-        },
-        "stream": False,
-    }
 
-    headers = {"Content-Type": "application/json"}
+    response = ollama.chat(
+        model=model,
+        messages=prompt,
+    )
 
-    response = requests.post(api, headers=headers, json=data)
-
-    if response.status_code == 200:
-        return response.json()["message"]["content"]
-    else:
-        raise ConnectionError(
-            "There was an issue with the model and/or API. Please check Ollama."
-        )
-
+    return response['message']['content']
 
 if __name__ == "__main__":
     ## GET ARGS
