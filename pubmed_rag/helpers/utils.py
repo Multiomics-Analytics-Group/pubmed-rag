@@ -113,35 +113,35 @@ def warn_folder(
         return warning_message
 
 
-def normalize_url(host:str, port:int)->str:
+def normalize_url(host:str, port:int, scheme:str='http')->str:
     """
     Normalize the given URL. Ensure the URL starts with 'http://'
 
     This function takes a URL and normalizes it by ensuring it has a scheme,
     converting it to lowercase, and removing any trailing slashes.
 
-    :param url: The URL to be normalized.
-    :type url: str
+    :param host: The host to be normalized.
+    :type host: str
     :param port: The port
     :type port: int
+    :param scheme: the scheme
+    :type scheme: str
     :return: The normalized URL.
     :rtype: str
 
-    :Example:
-
-    >>> normalize_url('HTTP://Example.com/')
-    'http://example.com'
     """
     ## PRECONDITIONS
     if not isinstance(host, str):
         raise TypeError(f"host should be a str e.g., 'localhost': {type(host)}")
     if not isinstance(port, int):
         raise TypeError(f"port must be int e.g., '7474': {type(port)}")
-        
+    if not isinstance(scheme, str):
+        raise TypeError(f"scheme must be str: {type(scheme)}")
+
     ## MAIN FUNCTION
     if not urlparse(host).netloc:
         host = urlunsplit(
-            ['http', host, '', '', '']
+            [scheme, host, '', '', '']
         )
     
     # Remove any trailing slashes
