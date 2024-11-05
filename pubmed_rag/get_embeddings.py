@@ -234,7 +234,7 @@ if __name__ == "__main__":
     logger.info(f"pmids are: {pmids}")
 
     # if the biocjson files already been downloaded
-    if args.files_downloaded:
+    if args.files_downloaded not in [None, "None"]:
         # check that the folder exists
         assert_path(args.files_downloaded)
         logger.info("Skipping biocjson file retreival from pubtator.")
