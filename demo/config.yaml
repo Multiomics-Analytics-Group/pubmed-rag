@@ -4,6 +4,7 @@ pubmed_rag:
   pmid file path: 'demo/demo_pmids.csv' 
   # where to put pubtator and embedding files
   biocjson output path: demo/output 
+  embedding output path: demo/output/the_embeddings.py
   # whether to collapse text by sections - will separate longer sections into multiple subsections
   condense sections: True
   # max num of tokens per text - will separate longer sections into multiple subsections

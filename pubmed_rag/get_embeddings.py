@@ -216,6 +216,7 @@ if __name__ == "__main__":
     tsne_fpath = config["tsne"]
     section_flag = config["condense sections"]
     pooling_choice = config["pooling"]
+    embed_out_path = config["embedding output path"]
     logger.info(f"Configuration: {config}")
 
     ## MAIN
@@ -301,10 +302,9 @@ if __name__ == "__main__":
     # put all in one df
     all_dfs = pd.concat(df_embeddings.values(), ignore_index=True)
     num_emb = len(all_dfs)
-    out_all_emb_fpath = os.path.join(output_path, "all_embeddings.csv")
-    logger.info(f"Saving all {num_emb} embeddings to: {out_all_emb_fpath}")
+    logger.info(f"Saving all {num_emb} embeddings to: {embed_out_path}")
     # save df to csv
-    all_dfs.to_csv(out_all_emb_fpath, sep="\t")
+    all_dfs.to_csv(embed_out_path, sep="\t")
 
     # if nonempty string / not False
     if tsne_fpath:

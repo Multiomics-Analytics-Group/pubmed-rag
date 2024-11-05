@@ -39,7 +39,7 @@ if __name__ == "__main__":
     pmid_path = config["pmid file path"]
     output_path = config["biocjson output path"]
     chosen_model = config["transformer_model"]
-
+    embed_out_path = config["embedding output path"]
     host_name = config["host"]
     port = config["port"]
     db_name = config["db name"]
@@ -78,8 +78,8 @@ if __name__ == "__main__":
     )
 
     # read in embeddings from get_embeddings.py
-    logger.info(f"Reading in embeddings from folder: {output_path} ...")
-    df = pd.read_csv(os.path.join(output_path, "all_embeddings.csv"), sep="\t") #TODO put naming in config?
+    logger.info(f"Reading in embeddings from: {embed_out_path} ...")
+    df = pd.read_csv(embed_out_path, sep="\t")
     # rename id and vector cols
     df = df.rename(
         columns={"Unnamed: 0": "id", "embedding": "vector"},
