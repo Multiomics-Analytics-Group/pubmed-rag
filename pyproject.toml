@@ -30,6 +30,7 @@ accelerate = "^1.0.0"
 ipykernel = "^6.29.5"
 ruff = "^0.7.0"
 ollama = "^0.3.3"
+cloud-tpu-client = "^0.10"
 
 
 [build-system]
