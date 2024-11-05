@@ -1,29 +1,35 @@
-### Mainly for getting the embeddings
-# list of pmids to put in vector db
-pmid file path: 'demo/demo_pmids.csv' 
-# where to put pubtator and embedding files
-biocjson output path: demo/output 
-# whether to collapse text by sections - will separate longer sections into multiple subsections
-condense sections: False
-# max num of tokens per text - will separate longer sections into multiple subsections
-max_tokens: 500
-# model from Hugging Face
-transformer_model: 'sentence-transformers/all-mpnet-base-v2'
-# the pre-trained model's output dimensions e.g., 768 for many LLMs
-output_dimensions: 768
-# filepath for tsne plot output - nothing or False if no tsne plot wanted
-tsne: demo/tsne.png 
+pubmed_rag:
+  ### Mainly for getting the embeddings
+  # list of pmids to put in vector db
+  pmid file path: 'demo/demo_pmids.csv' 
+  # where to put pubtator and embedding files
+  biocjson output path: demo/output 
+  # whether to collapse text by sections - will separate longer sections into multiple subsections
+  condense sections: True
+  # max num of tokens per text - will separate longer sections into multiple subsections
+  max_tokens: 100
+  # model from Hugging Face
+  transformer_model: microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext
+  # the pre-trained model's output dimensions e.g., 768 for many LLMs
+  output_dimensions: 768
+  # filepath for tsne plot output - nothing or False if no tsne plot wanted
+  tsne: demo/tsne.png 
+  pooling: attention_pooling
 
-### For creating the database
-# what to name the db
-db name: 'demo/demo.db'
-collection name: 'main'
-metric_type: 'COSINE'
+  # For creating the database
+  host: localhost
+  port: 19530
+  db name: 'tester'
+  collection name: 't100_att_BiomedNLP'
+  metric_type: 'COSINE'
 
-### For searching the vector database
-# number of nearest vector results to return during search/query
-n_results: 10
+  ### For searching the vector database
+  # number of nearest vector results to return during search/query
+  n_results: 10
 
-### to LLM
-llama model: llama3.1
-llama api: "http://localhost:11434/api/chat"
+  ### to LLM
+  llama model: llama3.1
+
+  #TODO Output path for plots
+  rag output folder: "demo/output"
+
