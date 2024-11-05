@@ -10,11 +10,9 @@ python = "^3.11"
 pandas = "^2.2.2"
 matplotlib = "^3.9.2"
 scikit-learn = "^1.5.1"
-seaborn = "^0.13.2"
 nltk = "^3.9.1"
 openpyxl = "^3.1.5"
 requests = "^2.32.3"
-biopython = "^1.84"
 pyyaml = "^6.0.2"
 transformers = "^4.44.2"
 torch = "^2.4.1"
@@ -23,15 +21,18 @@ torchaudio = "^2.4.1"
 tensorflow = "^2.17.0"
 flax = "^0.9.0"
 tf-keras = "^2.17.0"
-ipywidgets = "^8.1.5"
-sentence-transformers = "^3.1.1"
 pymilvus = "^2.4.6"
 accelerate = "^1.0.0"
-ipykernel = "^6.29.5"
-ruff = "^0.7.0"
 ollama = "^0.3.3"
 cloud-tpu-client = "^0.10"
 
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+ipywidgets = "^8.1.5"
+ipykernel = "^6.29.5"
+ruff = "^0.7.0"
 
 [build-system]
 requires = ["poetry-core"]
