@@ -30,7 +30,7 @@ pubmed_rag:
 
   ### to LLM
   llama model: llama3.1
-
+  llama_api : http://localhost:11434/api/chat
   #TODO Output path for plots
   rag output folder: "demo/output"
 
