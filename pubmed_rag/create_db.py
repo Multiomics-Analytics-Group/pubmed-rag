@@ -64,10 +64,7 @@ if __name__ == "__main__":
         logger.info(f"{db_name} already exists in {client.list_databases()}")
     # use db
     logger.info(f"Using {db_name}")
-    client = MilvusClient(
-        uri=uri,
-        db_name=db_name
-    )    
+    client.using_database(db_name)  
     # overwrite the given collection in the database if exists
     if client.has_collection(collection_name=col_name):
         client.drop_collection(collection_name=col_name)
