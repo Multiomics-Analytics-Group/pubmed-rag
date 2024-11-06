@@ -89,7 +89,7 @@ def find_similar_vectors(
         output_fields=["text", "pmid", "section", "sentence"],
         search_params=dict(metric_type=metric),
     )
-
+    client.close()
     return result[0]
 
 

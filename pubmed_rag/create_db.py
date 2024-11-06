@@ -93,6 +93,7 @@ if __name__ == "__main__":
     logger.info(f"Inserted data into db: {result}")
 
     logger.info("Complete.")
+    client.close()
 
 else:
     print("create_db.py imported. Script not ran.")

@@ -103,7 +103,6 @@ if __name__ == "__main__":
     assert_nonempty_keys(config)
     assert_nonempty_vals(config)
     llama_model = config["llama model"]
-    llama_api = config["llama api"]
     logger.info(f"Configuration: {config}")
 
     # ## MAIN
