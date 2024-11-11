@@ -125,23 +125,27 @@ if __name__ == "__main__":
         ]
         df_filtered = df_filtered.drop("index", axis=1)
 
-        # GET EMBEDDINGS
-        logger.info(f"Getting embeddings for {pmid}")
-        # Tokenize sentences
-        encoded_input = get_tokens(tokenizer, df_filtered["sentence"].to_list())
-        # get embeddings
-        sentence_embeddings = get_sentence_embeddings(model, encoded_input, pooling_function)
-        # append back to df
-        df_filtered["embedding"] = pd.Series(
-            sentence_embeddings.detach().numpy().tolist()
-        ).values
-        # rename sentences to text
-        df_filtered = df_filtered.rename(columns=dict(sentence="text"))
-        # save to csv
-        logger.info(f"Saving embeddings to {output_path}")
-        df_filtered.to_csv(
-            os.path.join(output_path, f"embed_{pmid}.csv"), index=False, sep="\t"
-        )
+        # if the dataframe is not empty basically
+        if len(df_filtered) > 0:        
+            # GET EMBEDDINGS
+            logger.info(f"Getting embeddings for {pmid}")
+            # Tokenize sentences
+            encoded_input = get_tokens(tokenizer, df_filtered["sentence"].to_list())
+            # get embeddings
+            sentence_embeddings = get_sentence_embeddings(model, encoded_input, pooling_function)
+            # append back to df
+            df_filtered["embedding"] = pd.Series(
+                sentence_embeddings.detach().numpy().tolist()
+            ).values
+            # rename sentences to text
+            df_filtered = df_filtered.rename(columns=dict(sentence="text"))
+            # save to csv
+            logger.info(f"Saving embeddings to {output_path}")
+            df_filtered.to_csv(
+                os.path.join(output_path, f"embed_{pmid}.csv"), index=False, sep="\t"
+            )
+        else:
+            logger.info(f"Embeddings not retrieved for {pmid}: No sentences.")
 
         return df_filtered
 
@@ -302,7 +306,7 @@ if __name__ == "__main__":
     # put all in one df
     all_dfs = pd.concat(df_embeddings.values(), ignore_index=True)
     num_emb = len(all_dfs)
-    logger.info(f"Saving all {num_emb} embeddings to: {embed_out_path}")
+    logger.info(f"Saving all {num_emb} embeddings to: {os.path.abspath(embed_out_path)}")
     # save df to csv
     all_dfs.to_csv(embed_out_path, sep="\t")
 
