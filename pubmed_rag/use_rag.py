@@ -16,14 +16,12 @@ from pubmed_rag.run_search import find_similar_vectors
 def init_prompt(
     query: str,
     results: list,
-    role: str = """
-    You are a cautious AI assistant. You are able to find concise answers to the questions from the contextual passage snippets provided and their affiliated pubmed articles.
+    role: str = """You are a cautious AI assistant. You are able to find concise answers to the questions only from the contextual passage snippets provided.""",
+    task: str = """
+    Use the following pieces of information in the "Context" section to provide an answer to the "Question".
+    Each context is annotated with a dictionary of metadata, such as "pmid" which is the pubmed ID of the publication that the context is from.
     Please check the context information carefully and do not use information that is not relevant to the question.
     If the retrieved context does not provide useful information to answer the question, say that you do not know.
-    """,
-    task: str = """
-    Use the following pieces of information enclosed in <context> tags to provide an answer to the question enclosed in <question> tags.
-    The context tags also have the attribute `pmid` which is the pubmed ID of the publication the <context> is from.
     """,
 ) -> list:
     """
@@ -35,13 +33,13 @@ def init_prompt(
     """
 
     # prepare question
-    question = f"<question>{query}</question>\n"
+    question = f'Question: "{query}".\n'
 
     # prepare context section
-    the_context = ""
+    the_context = "Context:\n"
     metadata = [x["entity"] for x in results]
     for data in metadata:
-        the_context += f"""<context pmid={str(data['pmid'])}>{data['text']}</context>
+        the_context += f""" - "data['text']" {{"pmid":"{str(data['pmid'])}"}}
         """
     # putting it together
     user_content = task + question + the_context
