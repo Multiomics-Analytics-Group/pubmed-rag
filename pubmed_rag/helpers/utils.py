@@ -14,21 +14,17 @@ import yaml
 ## CHECKS
 def assert_path(filepath: str):
     """
-    Checks that fpath is a string and that it exists
+    Checks that the given filepath is a string and that it exists.
 
-    PARAMS
-    -----
-    - filepath (str): the filepath or folderpath
-
-    OUTPUTS
-    -----
-    - raises assertion error if filepath is not a string or doesn't exist
+    :param str filepath: The filepath or folder path to check.
+    :raises TypeError: If the filepath is not a string.
+    :raises ValueError: If the filepath does not exist.
     """
 
-    assert isinstance(filepath, str), f"filepath must be a string: {filepath}"
-    assert os.path.exists(
-        os.path.abspath(filepath)
-    ), f"filepath does not exist: {os.path.abspath(filepath)}"
+    if not isinstance(filepath, str): 
+        raise TypeError(f"filepath must be a string: {type(filepath)}")
+    if not os.path.exists(os.path.abspath(filepath)): 
+        raise ValueError(f"filepath does not exist: {os.path.abspath(filepath)}")
 
 
 def assert_nonempty_keys(dictionary: dict):
