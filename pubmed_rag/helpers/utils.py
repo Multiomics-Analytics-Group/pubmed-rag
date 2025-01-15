@@ -7,25 +7,62 @@ import sys
 import warnings
 from datetime import datetime
 from urllib.parse import urlparse, urlunsplit
-
 import yaml
 
 
 ## CHECKS
-def assert_path(filepath: str) -> bool:
+def assert_path(filepath: str):
     """
     Checks that the given filepath is a string and that it exists.
 
     :param str filepath: The filepath or folder path to check.
     :raises TypeError: If the filepath is not a string.
-    :return: True if the filepath exists, False if not
-    :rtype: bool
+    :raises FileNotFoundError: If the filepath does not exist.
     """
 
-    if not isinstance(filepath, str): 
+    if not isinstance(filepath, str):
         raise TypeError(f"filepath must be a string: {type(filepath)}")
-    
-    return os.path.exists(os.path.abspath(filepath))
+    if not os.path.exists(os.path.abspath(filepath)):
+        raise FileNotFoundError(f"The specified path does not exist: {filepath}")
+
+
+def create_folder(directory_path: str, is_nested: bool = False) -> bool:
+    """
+    alternative to assert_path to create folder if it doesn't exist
+    :param directory_path: The path of the directory to create.
+    :type directory_path: str
+    :param is_nested: A flag indicating whether to create nested directories (True uses os.makedirs, False uses os.mkdir).
+    :type is_nested: bool
+    :returns: True if the folder was created or False if it already existed.
+    :rtype: bool
+    :raises OSError: If there is an error creating the directory.
+    """
+    # PRECONDITION CHECK
+    if not isinstance(directory_path, str):
+        raise TypeError(f"filepath must be a string: {type(directory_path)}")
+    abs_path = os.path.abspath(directory_path)
+
+    # make sure it is a folder not a file
+    if os.path.isfile(abs_path):
+        raise ValueError(
+            f"directory_path is an existing file when it should be a folder/foldername: {abs_path}"
+        )
+    # if folder already exists
+    elif os.path.isdir(abs_path):
+        return False
+    # create the folder(s)
+    else:
+        try:
+            if is_nested:
+                # Create the directory and any necessary parent directories
+                os.makedirs(directory_path, exist_ok=True)
+                return True
+            else:
+                # Create only the final directory (not nested)
+                os.mkdir(directory_path)
+                return True
+        except OSError as e:
+            raise OSError(f"Error creating directory '{directory_path}': {e}")
 
 
 def assert_nonempty_keys(dictionary: dict):
@@ -76,17 +113,18 @@ def warn_folder(
     warning_message: str = "Warning: There are existing files in the given folderpath.",
 ):
     """
-    Checks if the folder is empty. If not empty raise a warning.
+    Checks if the folder is empty. If not empty, raises a warning.
 
-    PARAMETERS
-    -----
-    - folderpath (str): path to folder
-    - warning_message (str): what you warning message should be if folder is not empty
+    :param folderpath: Path to the folder.
+    :type folderpath: str
+    :param warning_message: Warning message to display if the folder is not empty, defaults to "Warning: There are existing files in the given folderpath."
+    :type warning_message: str, optional
 
-    OUTPUTS
-    -----
-    - no return
-    - prints a warning message if files exist in the folderpath
+    :raises FileNotFoundError: If the specified path does not exist.
+    :raises AssertionError: If the warning message is not a string.
+
+    :return: Warning message if files exist in the folder.
+    :rtype: str
 
     EXAMPLES
     -----
@@ -110,7 +148,7 @@ def warn_folder(
         return warning_message
 
 
-def normalize_url(host:str, port:int, scheme:str='http')->str:
+def normalize_url(host: str, port: int, scheme: str = "http") -> str:
     """
     Normalize the given URL. Ensure the URL starts with 'http://'
 
@@ -137,20 +175,18 @@ def normalize_url(host:str, port:int, scheme:str='http')->str:
 
     ## MAIN FUNCTION
     if not urlparse(host).netloc:
-        host = urlunsplit(
-            [scheme, host, '', '', '']
-        )
-    
+        host = urlunsplit([scheme, host, "", "", ""])
+
     # Remove any trailing slashes
-    url = host.rstrip('/')
-    
+    url = host.rstrip("/")
+
     # Add the port
     url = f"{url}:{str(port)}"
 
     ## POSTCOND CHECKS
     if not urlparse(url).netloc:
         raise TypeError(f"Unable to normalize url: {url}")
-    
+
     return url
 
 
@@ -187,7 +223,19 @@ def config_loader(filepath: str) -> dict:
 
 
 def filter_config(config:dict, additional:list=["pubmed_rag"])->dict:
-    """TODO"""
+    """
+    Filters the given configuration dictionary to only include specified keys.
+    This function takes a configuration dictionary and filters it to only include
+    keys specified in the `additional` list and the result of `get_basename()`.
+    :param config: The configuration dictionary to filter.
+    :type config: dict
+    :param additional: A list of additional keys to keep in the filtered configuration.
+                        Defaults to ["pubmed_rag"].
+    :type additional: list
+    :raises TypeError: If `config` is not a dictionary or `additional` is not a list.
+    :return: A filtered configuration dictionary containing only the specified keys.
+    :rtype: dict
+    """
 
     ## PRECONDITION
     if not isinstance(config, dict):
@@ -216,10 +264,11 @@ def get_args(prog_name: str, others: dict = {}):
     :returns:
     :rtype:
     """
-
     ### PRECONDITIONS
-    assert isinstance(prog_name, str), f"prog_name should be a string: {prog_name}"
-    assert isinstance(others, dict), f"other kwargs must be a dict: {others}"
+    if not isinstance(prog_name, str):
+        raise TypeError(f"prog_name should be a string: {type(prog_name)}")
+    if not isinstance(others, dict):
+        raise TypeError(f"other kwargs must be a dict: {type(others)}")
     ## MAIN FUNCTION
     # init
     parser = argparse.ArgumentParser(prog=prog_name, **others)
@@ -230,17 +279,6 @@ def get_args(prog_name: str, others: dict = {}):
         action="store",
         default="demo/config.yaml",
         help="provide path to config yaml file",
-    )
-    # used in run_search.py
-    parser.add_argument(
-        "-q", "--query", action="store", help="text to embed and search in vector db"
-    )
-    # used in get_embeddings.py
-    parser.add_argument(
-        "-fd",
-        "--files_downloaded",
-        action="store",
-        help="add path to the biocjson files if already downloaded",
     )
     args = parser.parse_args()
     return args
@@ -499,33 +537,3 @@ def filter_filepaths(
         ]
 
         return ex_filtered
-
-
-def pipe(input, functions: list = []):
-    """
-    - Pipes output of one function into another like '|' in linux
-    - https://stackoverflow.com/questions/28252585/functional-pipes-in-python-like-from-rs-magrittr
-    - Limitation:
-        - All functions must only expect one argument
-        - Defaults will have to be used for all other arguments
-
-    PARAMS
-    -----
-    - input (Any): whatever input the first function is expecting
-    - functions (list): a list of functions IN ORDER OF EXECUTION
-        do not include () at end of functions
-
-    OUTPUTS
-    -----
-    - Any or None (whatever the expected output is from the final function in the list)
-
-    """
-    # PRECONDITIONALS
-    assert isinstance(functions, list), "functions should be in a list"
-    for f in functions:
-        assert callable(f), f"{f} is not a function"
-
-    # MAIN FUNCTION
-    for f in functions:
-        input = f(input)
-    return input
