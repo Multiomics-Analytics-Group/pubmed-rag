@@ -23,7 +23,7 @@ flax = "^0.9.0"
 tf-keras = "^2.17.0"
 pymilvus = "^2.4.6"
 accelerate = "^1.0.0"
-ollama = "^0.3.3"
+ollama = ">=0.4.4,<1"
 cloud-tpu-client = "^0.10"
 
 [tool.poetry.group.dev]
