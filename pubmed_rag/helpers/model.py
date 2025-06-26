@@ -31,21 +31,26 @@ def attention_pooling(model_output, attention_scores):
 
 def map_pooling(pooling:str):
     """
-    Retrieve the pooling function based on the given pooling type.
+    Maps a string representing the pooling type to the corresponding pooling function.
+    Parameters
+    ----------
+    pooling : str
+        The type of pooling to be used. Must be one of 'mean_pooling' or 'attention_pooling'.
 
-    This function maps a string representing the pooling type to the corresponding
-    pooling function. It raises a TypeError if the input is not a string and a
-    ValueError if the pooling type is not recognized.
+    Returns
+    -------
+    function
+        The corresponding pooling function.
 
-    :param pooling: The type of pooling to be used. Must be one of 'mean_pooling' or 'attention_pooling'.
-    :type pooling: str
-    :raises TypeError: If the input is not a string.
-    :raises ValueError: If the pooling type is not recognized.
-    :return: The corresponding pooling function.
-    :rtype: function
-
-    :Example:
-
+    Raises
+    ------
+    TypeError
+        If the input is not a string.
+    ValueError
+        If the pooling type is not recognized.
+        
+    Examples
+    --------
     >>> map_pooling('mean_pooling')
     <function mean_pooling at 0x...>
     >>> map_pooling('attention_pooling')
