@@ -280,6 +280,13 @@ def get_args(prog_name: str, others: dict = {}):
         default="demo/config.yaml",
         help="provide path to config yaml file",
     )
+    parser.add_argument(
+        "-fd",
+        "--files_downloaded",
+        action="store",
+        default=None,
+        help="provide path to where biocjson files are downloaded",
+    )
     args = parser.parse_args()
     return args
 
